@@ -8,15 +8,19 @@ MULDER runs on Debian GNU/Linux and OS X and Python 2.7
 
 1. Download MULDER
     Clone using git:
+
     `$ git clone https://github.com/SDM-TIB/MULDER.git`
 
 2. Go to MULDER folder:
+
     `$ cd MULDER`
 
 3. Run:
+
     `pip install -r requirements.txt`
 
 4. Install MULDER:
+
     `python setup.py install`
 
 Configure MULDER
@@ -26,9 +30,9 @@ Configure MULDER
 
     Example:
 
-    `http://dbpedia.org/sparql
+    ```http://dbpedia.org/sparql
      http://biotea.linkeddata.es/sparql
-     http://colil.dbcls.jp/sparql`
+     http://colil.dbcls.jp/sparql```
 
 2. Run RDF molecule template extractor in `scripts` folder:
 
@@ -38,7 +42,7 @@ Configure MULDER
 
     Example:
 
-    `{
+    ```{
       "MoleculeTemplates": [
         {
            "type": "filepath",
@@ -46,7 +50,8 @@ Configure MULDER
              }
           ]
        }
-       `
+       ```
+
 4. Now MULDER is ready to "investigate" :)
 
 
