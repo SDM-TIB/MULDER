@@ -632,6 +632,7 @@ def get_single_source_rdfmts(enpointmaps):
         try:
             with open(enpointmaps[endpoint], 'w+') as f:
                 json.dump(rdfmols, f)
+                f.close()
         except Exception as e:
             print "WARN: exception while writing single source molecules:", endpoint, e.message
 
@@ -747,3 +748,4 @@ if __name__ == "__main__":
 
     with open(pathToOutput, 'w+') as f:
         json.dump(molecules, f)
+        f.close()

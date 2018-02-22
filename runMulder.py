@@ -34,7 +34,7 @@ def runQuery(query, configfile, tempType, isEndpoint, res, qplan, adaptive, with
     '''
 
     endpointType = 'V'
-
+    query = query.decode()
     logger.info("Query: " + query)
 
     config = ConfigFile(configfile)
