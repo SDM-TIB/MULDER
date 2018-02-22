@@ -6,8 +6,10 @@ from mulder.molecule.MTManager import ConfigFile
 from mulder.mediator.decomposition.MediatorDecomposer import MediatorDecomposer
 from mulder.mediator.planner.MediatorPlanner import MediatorPlanner
 from mulder.mediator.planner.MediatorPlanner import contactSource as contactsparqlendpoint
-import sys, os, signal
+import sys, os, signal, getopt
+
 from time import time
+
 __author__ = 'kemele'
 
 
@@ -108,11 +110,62 @@ def onSignal2(s, stackframe):
     sys.exit(s)
 
 
-if __name__ == '__main__':
+def get_options(argv):
+    try:
+        opts, args = getopt.getopt(argv, "h:q:c:s:")
+    except getopt.GetoptError:
+        usage()
+        sys.exit(1)
 
-    queryss = open("queries/simpleQueries/SQ9").read()
-    config = ConfigFile("config/config.json")
-    tempType = "MULDER" #"SemEP" "METIS"
+    query = None
+    '''
+    Supported output formats:
+        - json (default)
+        - nt
+        - SPARQL-UPDATE (directly store to sparql endpoint)
+    '''
+    config = 'config/config.json'
+    isstring = -1
+    for opt, arg in opts:
+        if opt == "-h":
+            usage()
+            sys.exit()
+        elif opt == "-q":
+            query = arg
+        elif opt == "-c":
+            config = arg
+
+    if not query:
+        usage()
+        sys.exit(1)
+
+    # TODO: validate file path and sparql-endpoint capability (Update capability)
+
+    return query, config, isstring
+
+
+def usage():
+    usage_str = ("Usage: {program} -q <query>  \n"
+                 "-c <path/to/config.json> \n"
+                 "-s <isstring> \n "
+                 "where \n"
+                 "\t<query> - SPARQL QUERY  \n"
+                 "\t<path/to/config.json> - path to configuration file  \n"
+                 "\t<isstring> - (Optional) set if <query> is sent as string: \n"
+                 "\t\tavailable values 1 or -1. -1 is default, meaning query is from file\n")
+
+    print usage_str.format(program=sys.argv[0]),
+
+
+if __name__ == '__main__':
+    query, config, isstring=get_options(sys.argv[1:])
+    if isstring == 1:
+        queryss = query.decode()
+    else:
+        queryss = open(query).read()
+
+    config = ConfigFile(config)
+    tempType = "MULDER"
     joinstarslocally = False
 
     global time1
@@ -128,15 +181,15 @@ if __name__ == '__main__':
     t1 = -1
     tn = -1
     dt = -1
-    qname = "SQ10"
+    qname = "Q"
     time1 = time()
     dc = MediatorDecomposer(queryss, config, tempType, joinstarslocally)
-    print queryss
+    print 'Query:', queryss
 
     quers = dc.decompose()
     dt = time() - time1
-    print type(quers)
-    print quers
+    #print type(quers)
+    print "Decomposed qeury:", quers
     print "======================================================="
     if quers is None:
         print "Query decomposer returns None"
@@ -145,15 +198,15 @@ if __name__ == '__main__':
     planner = MediatorPlanner(quers, True, contactsparqlendpoint, None, config)
     plan = planner.createPlan()
     pt = time() - time1
-    print plan
-    exit()
+    print "Query execution Plan:", plan
+
     output = Queue()
     #plan.execute(output)
-    print "*+*+*+*+*+*+*+*+*+*+*+*+*+++++"
+    print "*+*+*+*+*+*+*+*+*+*+*+*+Result*+*+*+*+*+*+*+++++"
     i = 0
     p2 = Process(target=plan.execute, args=(output,))
     p2.start()
-    p3 = Process(target=conclude, args=(output, p2, False, False))
+    p3 = Process(target=conclude, args=(output, p2, True, False))
     p3.start()
     signal.signal(12, onSignal1)
 
