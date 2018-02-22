@@ -30,9 +30,11 @@ Configure MULDER
 
     Example:
 
-    ```http://dbpedia.org/sparql
+    ```
+     http://dbpedia.org/sparql
      http://biotea.linkeddata.es/sparql
-     http://colil.dbcls.jp/sparql```
+     http://colil.dbcls.jp/sparql
+    ```
 
 2. Run RDF molecule template extractor in `scripts` folder:
 
@@ -42,7 +44,8 @@ Configure MULDER
 
     Example:
 
-    ```{
+    ```
+      {
       "MoleculeTemplates": [
         {
            "type": "filepath",
@@ -50,7 +53,7 @@ Configure MULDER
              }
           ]
        }
-       ```
+    ```
 
 4. Now MULDER is ready to "investigate" :)
 
