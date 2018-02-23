@@ -359,14 +359,10 @@ class MediatorDecomposer(object):
         for s in res:
             sc = [c for c in conn if s in conn[c]]
             for c in sc:
-                connectingtp = []
-                for tp in stars[c]:
-                    if tp.theobject.name == s:
-                        pred = utils.getUri(tp.predicate, self.prefixes)[1:-1]
-                        if pred not in connectingtp:
-                            connectingtp.append(pred)
+                connectingtp = [utils.getUri(tp.predicate, self.prefixes)[1:-1]
+                         for tp in stars[c] if tp.theobject.name == s]
+                connectingtp = list(set(connectingtp))
                 sm = selectedmolecules[s]
-
                 for m in sm:
                     srange = [p for r in self.config.metadata[m]['predicates'] for p in r['range'] if
                               r['predicate'] in connectingtp]
@@ -376,6 +372,7 @@ class MediatorDecomposer(object):
                             newfilteredonly[s].extend(filteredmols)
                         else:
                             res[s] = filteredmols
+
         for s in newfilteredonly:
             res[s] = list(set(newfilteredonly[s]))
 
@@ -389,8 +386,9 @@ class MediatorDecomposer(object):
         types = self.getRDFTypeStatement(ltr)
         typemols = []
         for t in types:
-            if t in self.config.metadata:
-                typemols.append(t)
+            tt = utils.getUri(t.theobject, self.prefixes)[1:-1]
+            if tt in self.config.metadata:
+                typemols.append(tt)
 
         return typemols
 
