@@ -1,0 +1,8 @@
+{
+  "MoleculeTemplates": [
+    {
+       "type": "filepath",
+       "path":"templates/publications/biotea-colil-dbcls.json"
+     }
+  ]
+}

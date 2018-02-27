@@ -158,11 +158,15 @@ def usage():
 
 
 if __name__ == '__main__':
-    query, config, isstring=get_options(sys.argv[1:])
-    if isstring == 1:
-        queryss = query.decode()
-    else:
-        queryss = open(query).read()
+
+    # query, config, isstring = get_options(sys.argv[1:])
+    # if isstring == 1:
+    #     queryss = query.decode()
+    # else:
+    #     queryss = open(query).read()
+    #
+    queryss = open('queries/doi').read()
+    config = 'config/pubs.json'
 
     config = ConfigFile(config)
     tempType = "MULDER"

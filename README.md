@@ -71,9 +71,7 @@ Running MULDER
 Once you installed MULDER and the Molecule Templates are ready with config.json,
 you can start running MULDER using the following script:
 
-    ```
-      $ python test_mulder.py -q <query> -c <path/to/config.json> -s <isstring>
-    ```
+    `$ python test_mulder.py -q <query> -c <path/to/config.json> -s <isstring>`
  where:
 
  `<query>`:               - SPARQL QUERY
@@ -83,7 +81,7 @@ you can start running MULDER using the following script:
  Running experiments:
  ===================
 
- `./runQueries.sh <path/to/queries-dir> <path/to/config.json> <path/to/results-folder> errors.txt MULDER &`
+ `$./runQueries.sh <path/to/queries-dir> <path/to/config.json> <path/to/results-folder> errors.txt MULDER &`
 
  OR
 

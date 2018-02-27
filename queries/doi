@@ -1,0 +1,18 @@
+prefix bibo: <http://purl.org/ontology/bibo/>
+prefix colil: <http://purl.jp/bio/10/colil/ontology/201303#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT *
+WHERE{
+    ?biboArticle a bibo:AcademicArticle.
+    ?biboArticle bibo:doi ?biboDOI .
+    ?colilArticle bibo:doi ?biboDOI .
+    ?colilArticle rdfs:seeAlso ?pubmed .
+    ?colilArticle colil:pmcid ?pmcid .
+    ?pubmed <http://togows.dbcls.jp/ontology/ncbi-pubmed#dp> ?do .
+    ?pubmed <http://togows.dbcls.jp/ontology/ncbi-pubmed#pmid> ?pmid .
+    ?pubmed <http://togows.dbcls.jp/ontology/ncbi-pubmed#so> ?so.
+    ?pubmed <http://togows.dbcls.jp/ontology/ncbi-pubmed#ti> ?ti .
+    ?pubmed <http://purl.jp/bio/10/colil/ontology/201303#Authors> ?author .
+}
+limit 100

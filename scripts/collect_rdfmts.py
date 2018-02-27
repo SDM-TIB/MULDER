@@ -422,10 +422,13 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
         server = endpoint1.split("http://")[1]
     (server, path) = server.split("/", 1)
     reslist = []
-    limit = 100
+    limit = 10
     offset = 0
     numrequ = 0
     checked_inst = []
+    links_found = []
+    print "Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2
+    print '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
     while True:
         query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
         res, card = contactSource(query_copy, referer, server, path)
@@ -445,11 +448,14 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
                 offset += limit
                 continue
             for c in rdfmt2:
-
+                if c['rootType'] in links_found:
+                    continue
                 exists = link_exist(inst['o'], c['rootType'], endpoint2)
+                checked_inst.append(inst['o'])
                 if exists:
                     reslist.append(c['rootType'])
-                    # print inst['o'], ',', c['rootType']
+                    links_found.append(c['rootType'])
+                    print rootType, ',', pred, '->', c['rootType']
             reslist = list(set(reslist))
 
         if card < limit:
@@ -470,12 +476,13 @@ def link_exist(s, c, endpoint):
         server = endpoint.split("http://")[1]
     (server, path) = server.split("/", 1)
     res, card = contactSource(query, referer, server, path)
-    if card > 0:
-        if res[0]:
-            print "ASK result", res, endpoint
-        return res[0]
     if res is None:
         print 'bad request on, ', s, c
+    if card > 0:
+        if res:
+            print "ASK result", res, endpoint
+        return res
+
     return False
 
 
@@ -641,7 +648,7 @@ def get_single_source_rdfmts(enpointmaps):
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:e:o:p:")
+        opts, args = getopt.getopt(argv, "h:e:o:p:f:")
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -655,7 +662,7 @@ def get_options(argv):
     '''
     outputType = 'json'
     pathToOutput = './'
-
+    isFromFile = False
     for opt, arg in opts:
         if opt == "-h":
             usage()
@@ -666,6 +673,8 @@ def get_options(argv):
             outputType = arg
         elif opt == "-p":
             pathToOutput = arg
+        elif opt == '-f':
+            isFromFile = True
 
     if not outputType or outputType.lower() not in ['json', 'nt', 'sparql-update']:
         usage()
@@ -673,17 +682,19 @@ def get_options(argv):
 
     # TODO: validate file path and sparql-endpoint capability (Update capability)
 
-    return endpointfile, outputType, pathToOutput
+    return endpointfile, outputType, pathToOutput, isFromFile
 
 
 def usage():
     usage_str = ("Usage: {program} -e <endpoints-file>  "
                  "-o <output-type> "
-                 "-p <output-path> \n "
+                 "-p <output-path> "
+                 "-f <isFromFile> \n "
                  "where \n"
-                 "\t<endpoints-file> - a text file containing a list of endpoint URLs \n"
+                 "\t<endpoints-file> - a text file containing a list of endpoint URLs OR folder name of single source MTs if -f flag is set\n"
                  "\t<output-type> - type of output; available options: json, nt, sparql-update  \n"
-                 "\t<output-path> - output filename or URL for sparql endpoint with update support\n")
+                 "\t<output-path> - output filename or URL for sparql endpoint with update support\n"
+                 "\t<isFromFile>  - set this flag = 1 if single source MTs are already stored in a folder")
 
     print usage_str.format(program=sys.argv[0]),
 
@@ -711,27 +722,29 @@ def endpointsAccessible(endpoints):
 
 if __name__ == "__main__":
     pp = pprint.PrettyPrinter(indent=2)
-    endpointfile, outputType, pathToOutput = get_options(sys.argv[1:])
+    endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
+    if not isFromFile:
+        with open(endpointfile, 'r') as f:
+            endpoints = f.readlines()
+            if len(endpoints) == 0:
+                print("Endpoints file should have at least one url")
+                sys.exit(1)
 
-    with open(endpointfile, 'r') as f:
-        endpoints = f.readlines()
-        if len(endpoints) == 0:
-            print("Endpoints file should have at least one url")
-            sys.exit(1)
+            endpoints = [e.strip('\n') for e in endpoints]
+            if not endpointsAccessible(endpoints):
+                print("None of the endpoints can be accessed. Please check if you write URLs properly!")
+                sys.exit(1)
 
-        endpoints = [e.strip('\n') for e in endpoints]
-        if not endpointsAccessible(endpoints):
-            print("None of the endpoints can be accessed. Please check if you write URLs properly!")
-            sys.exit(1)
+        rdfmts = {}
 
-    rdfmts = {}
+        for e in endpoints:
 
-    for e in endpoints:
-
-        print("Parsing: ", e)
-        val = e.replace('/', '_').replace(':', '_')
-        rdfmt = get_single_source_rdfmts({e: val})
-        rdfmts[e] = rdfmt
+            print("Parsing: ", e)
+            val = e.replace('/', '_').replace(':', '_')
+            rdfmt = get_single_source_rdfmts({e: val})
+            rdfmts[e] = rdfmt
+    else:
+        rdfmts = read_rdfmts(endpointfile)
 
     for endpoint1 in rdfmts:
         for endpoint2 in rdfmts:
