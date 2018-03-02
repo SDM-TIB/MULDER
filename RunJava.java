@@ -18,7 +18,9 @@ public class RunJava {
            " } LIMIT 100";
     System.out.println(query);
    
-    Process p = Runtime.getRuntime().exec("python2.7 runMulder.py -c config/config.json -q " + URLEncoder.encode(query));
+    Process p = Runtime.getRuntime().exec(new String[]{
+            "python3.5", "runMulder.py", "-c", "config/config.json", "-q", query});
+    }
 
     BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
     BufferedReader br_err = new BufferedReader(new InputStreamReader(p.getErrorStream()));
@@ -26,7 +28,7 @@ public class RunJava {
     System.out.println("Results retured from MULDER:");
     while ((s=br.readLine()) != null && !s.equals("EOF")){
 	//put s in your hashlist or other data structure
-	System.out.println(s);
+	  System.out.println(s);
      }
 
     System.exit(0);

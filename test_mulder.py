@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 
 from multiprocessing import Process, Queue, active_children
 

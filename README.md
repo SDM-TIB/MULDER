@@ -4,7 +4,7 @@
 Installing MULDER
 =================
 
-MULDER runs on Debian GNU/Linux and OS X and Python 2.7
+MULDER runs on Debian GNU/Linux and OS X and Python 3.5
 
 1. Download MULDER
     Clone using git:
@@ -31,14 +31,13 @@ Configure MULDER
     Example:
 
     ```
-     http://dbpedia.org/sparql
      http://biotea.linkeddata.es/sparql
      http://colil.dbcls.jp/sparql
     ```
 
 2. Run RDF molecule template extractor in `scripts` folder:
 
-    `scripts$ python collect_rdfmts.py -e endpoints.txt -o json -p 'templates/mytemplates.json'`
+    `scripts$ python3.5 collect_rdfmts.py -e endpoints.txt -o json -p 'templates/mytemplates.json'`
 
 3. Create configuration file, `config.json` in `config` folder:
 
@@ -71,7 +70,7 @@ Running MULDER
 Once you installed MULDER and the Molecule Templates are ready with config.json,
 you can start running MULDER using the following script:
 
-    `$ python test_mulder.py -q <query> -c <path/to/config.json> -s <isstring>`
+    `$ python3.5 test_mulder.py -q <query> -c <path/to/config.json> -s <isstring>`
  where:
 
  `<query>`:               - SPARQL QUERY
@@ -85,4 +84,4 @@ you can start running MULDER using the following script:
 
  OR
 
- `$ python start_experiment.py -c <path/to/config.json> -q <query-file> -r <path/to/results-folder> -t 'MULDER' -s True`
+ `$ python3.5 start_experiment.py -c <path/to/config.json> -q <query-file> -r <path/to/results-folder> -t 'MULDER' -s True`
