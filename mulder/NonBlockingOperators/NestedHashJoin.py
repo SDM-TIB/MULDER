@@ -11,10 +11,10 @@ Date: July 18th, 2012
 from multiprocessing import Queue, Process
 from time import time
 import string, sys
-from Queue import Empty
+from multiprocessing.queues import Empty
 from mulder.Operators.Join import Join
 #from ontario.mediator.decomposer.Tree import Leaf, Node
-from OperatorStructures import Table, Partition, Record
+from .OperatorStructures import Table, Partition, Record
 
 
 class NestedHashJoin(Join):
@@ -70,7 +70,7 @@ class NestedHashJoin(Join):
                     pass
                 except Exception as e:
                     #print "Unexpected error:", sys.exc_info()[0]
-                    print e
+                    print (e)
                     pass
 
             toRemove = [] # stores the queues that have already received all its tuples

@@ -8,12 +8,12 @@ Autor: Gabriela Montoya
 Date: November 18th, 2013
 
 '''
-from OperatorStructures import Table, Partition, Record
+from .OperatorStructures import Table, Partition, Record
 from multiprocessing import Queue, Process
 from time import time
 #from ontario.mediator.decomposer.Tree import Leaf, Node
 import string, sys
-from Queue import Empty
+from multiprocessing.queues import Empty
 from mulder.Operators.Optional import Optional
 
 class NestedHashOptional(Optional):

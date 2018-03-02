@@ -1,7 +1,7 @@
 
 from ply import lex, yacc
 
-from services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression
+from mulder.common.parser.services import Query, Argument, Triple, UnionBlock, JoinBlock, Optional, Filter, Expression
 
 # Lexer
 
@@ -851,7 +851,7 @@ def p_predicate_rdftype(p):
         value = '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>'
         p[0] = Argument(value,True)
     else:
-        print 'raising'
+        print ('raising')
         p_error(p[1])
         raise SyntaxError
 
@@ -905,7 +905,7 @@ def p_object_constant(p):
         p[0] = Argument(c[:c.find("^")], True, datatype="<" + xsd + "string>",lang=c[c.rfind("@")+1:])
 
 def p_error(p):
-    print p
+    print (p)
     if isinstance(p, str):
         value = p
     else:

@@ -35,6 +35,7 @@ def runQuery(query, configfile, tempType, isEndpoint, res, qplan, adaptive, with
 
     endpointType = 'V'
     query = query.decode()
+    query = query.replace('+', ' ')
     logger.info("Query: " + query)
 
     config = ConfigFile(configfile)
@@ -43,7 +44,7 @@ def runQuery(query, configfile, tempType, isEndpoint, res, qplan, adaptive, with
     new_query = mdq.decompose()
 
     if new_query is None: # if the query could not be answered by the endpoints
-        print "EOF"
+        print ("EOF")
         return
 
     logger.info(new_query)
@@ -58,7 +59,7 @@ def runQuery(query, configfile, tempType, isEndpoint, res, qplan, adaptive, with
 
     while True:
         r = res.get()
-        print r
+        print(r)
         if r == "EOF":
             break
 
@@ -103,7 +104,7 @@ def get_options(argv):
 
 def usage():
     usage_str = ("Usage: {program} -c <config.json_file>  -q <query>\n")
-    print usage_str.format(program=sys.argv[0]),
+    print (usage_str.format(program=sys.argv[0]),)
 
 
 def main(argv):
@@ -112,7 +113,7 @@ def main(argv):
     try:
         runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, result_folder)
     except Exception as ex:
-        print ex
+        print (ex)
 
 
 if __name__ == '__main__':

@@ -7,13 +7,13 @@ The intermediate results are represented as queues.
 @author: Maribel Acosta Deibe
 '''
 from multiprocessing import Queue
-from Queue import Empty
+from multiprocessing.queues import Empty
 from tempfile import NamedTemporaryFile
 from threading import Timer
 from random import randint
 from os import remove
 from mulder.Operators.Join import Join
-from OperatorStructures import Table, Partition, Record, FileDescriptor, isOverlapped
+from .OperatorStructures import Table, Partition, Record, FileDescriptor, isOverlapped
 
 class XJoin(Join):
 

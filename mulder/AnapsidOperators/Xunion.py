@@ -7,7 +7,7 @@ The intermediate results are represented in a queue.
 @author: Maribel Acosta Deibe
 '''
 from multiprocessing import Queue
-from Queue import Empty
+from multiprocessing.queues import Empty
 from mulder.Operators.Union import _Union
 
 class Xunion(_Union):

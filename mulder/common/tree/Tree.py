@@ -146,7 +146,7 @@ def unify (vars0, vars1, dict0):
     for v in vars1:
        if v in vars2:
            dict0[v] = dict0[v] - 1
-           if dict0.has_key(v) and dict0[v] == 0:
+           if v in dict0 and dict0[v] == 0:
               del dict0[v]
               vars2.remove(v)
        else:
@@ -224,7 +224,7 @@ class Leaf(Tree):
         vs = list(set(self.service.getVars()))# - set(self.service.filters_vars)) # Modified this by mac: 31-01-2014
         #print "service", vs
         predictVar=set(self.service.getPredVars())
-        variables = [string.lstrip(string.lstrip(v, "?"), "$") for v in vs]
+        variables = [v.lstrip("?$") for v in vs]
         if query.args == []:
             projvars = vs
         else:
@@ -244,7 +244,7 @@ class Leaf(Tree):
         if query.body.show(" ").count("SERVICE") == 1:
             subvars = list(set(projvars) | set(vars_order_by))
             #print "subvar 3: ", subvars
-        subvars = string.joinfields(subvars, " ")
+        subvars = " ".join(subvars)
         #MEV distinct pushed down to the sources
         #print 'subvars 4: ', subvars
         if query.distinct:
@@ -260,7 +260,7 @@ class Leaf(Tree):
         subquery = self.service.getTriples()
         if len(vars) == 0:
             vs = self.service.getVars()
-            variables = [string.lstrip(string.lstrip(v, "?"), "$") for v in vs]
+            variables = [v.lstrip("?$") for v in vs]
             vars_str = "*"
         else:
             variables = vars
@@ -272,7 +272,7 @@ class Leaf(Tree):
                         vars2.append(v2)
                         break
             if len(vars2) > 0:
-                vars_str = string.joinfields(vars2, " ")
+                vars_str = " ".join(vars2)
             else:
                 vars_str = "*"
 
@@ -297,7 +297,7 @@ def sort(lss):
     lo = []
     while not(lss == []):
         m = 0
-        for i in xrange(len(lss)):
+        for i in range(len(lss)):
             if lss[i].constantPercentage() > lss[m].constantPercentage():
                 m = i
         lo.append(lss[m])
@@ -326,7 +326,7 @@ def createLeafs(lss,filters=[]):
         e = set()
         l = s.getVars()
         for v in l:
-            if d.has_key(v):
+            if v in d:
                 e.add(v)
         ls.append(Leaf(s, e, d,filters))
 

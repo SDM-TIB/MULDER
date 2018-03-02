@@ -8,7 +8,7 @@ work until all the tuples are arrived.
 @author: Maribel Acosta Deibe
 '''
 from time import time
-from OperatorStructures import Table, Record
+from .OperatorStructures import Table, Record
 from mulder.Operators.Join import Join
 
 class HashJoin(Join):

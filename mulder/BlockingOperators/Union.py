@@ -80,8 +80,8 @@ class Union(_Union):
         if self.distinct:
             for t in self.left:
                 if not (t in self.right):
-                    results.append(t)
-            results.extends(self.right)
+                    self.results.append(t)
+            self.results.extend(self.right)
         else:
             self.results = self.left + self.right
 

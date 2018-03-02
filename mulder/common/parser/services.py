@@ -185,18 +185,18 @@ class Query(object):
 
     def instantiate(self, d):
         new_args = []
-        for a in self.args:
-            an = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
-            if not (an in d):
-                new_args.append(a)
+        # for a in self.args:
+        #     an = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
+        #     if not (an in d):
+        #         new_args.append(a)
         return Query(self.prefs, new_args, self.body.instantiate(d), self.distinct)
 
     def instantiateFilter(self, d, filter_str):
         new_args = []
-        for a in self.args:
-            an = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
-            if not (an in d):
-                new_args.append(a)
+        # for a in self.args:
+        #     an = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
+        #     if not (an in d):
+        #         new_args.append(a)
         return Query(self.prefs, new_args, self.body, self.distinct, self.filter_nested + ' ' + filter_str)
 
     def places(self):
@@ -975,9 +975,9 @@ class Triple(object):
         return 3
 
     def instantiate(self, d):
-        sn = string.lstrip(string.lstrip(self.subject.name, "?"), "$")
-        pn = string.lstrip(string.lstrip(self.predicate.name, "?"), "$")
-        on = string.lstrip(string.lstrip(self.theobject.name, "?"), "$")
+        sn = self.subject.name.lstrip('?$')
+        pn = self.predicate.name.lstrip('?$')
+        on = self.theobject.name.lstrip('?$')
         if (not self.subject.constant) and (sn in d):
             s = Argument(d[sn], True)
         else:

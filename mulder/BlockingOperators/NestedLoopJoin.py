@@ -9,7 +9,7 @@ The intermediate results are represented as lists.
 from time import time
 from multiprocessing import Queue
 from mulder.Operators.Join import Join
-from OperatorStructures import Table, Partition, Record
+from .OperatorStructures import Table, Partition, Record
 
 class NestedLoopJoin(Join):
 

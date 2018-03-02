@@ -2,7 +2,7 @@ __author__ = 'kemele'
 
 import logging
 
-import utils
+import mulder.mediator.decomposition.utils as utils
 import os
 from mulder.common.parser import queryParser
 from mulder.common.parser.services import Service, Triple, Filter, Optional, UnionBlock, JoinBlock
@@ -125,7 +125,7 @@ class MediatorDecomposer(object):
                             unions[tp] = t
 
                     else:
-                        print "cannot find any matching cluster for:", tl
+                        print ("cannot find any matching cluster for:", tl)
                         return []
                 else:
                     mm = [m for m in self.config.metadata]
@@ -193,7 +193,7 @@ class MediatorDecomposer(object):
                 else:
                     selectedmolecules[s] = mols
             else:
-                print "cannot find any matching molecules for:", tl
+                print ("cannot find any matching molecules for:", tl)
                 return []
         if len(varpreds) > 0:
             mols = [m for m in self.config.metadata]
@@ -203,7 +203,7 @@ class MediatorDecomposer(object):
         molConn = self.getMTsConnection(selectedmolecules)
         results = []
         res = self.pruneMTs(conn, molConn, selectedmolecules, stars)
-        print res
+        print(res)
         qpl0 = []
         qpl1 = []
         for s in res:
@@ -285,7 +285,7 @@ class MediatorDecomposer(object):
                     sourceindex[w['url']] = list(set(sourceindex[w['url']]))
 
         if len(sourceindex) == 1:
-            return Service('<' + sourceindex.keys()[0] + '>', list(set(triplepatterns)))
+            return Service('<' + list(sourceindex.keys())[0] + '>', list(set(triplepatterns)))
 
         # for url in sourceindex:
         #     eps = sourceindex[url]
@@ -615,12 +615,12 @@ class MediatorDecomposer(object):
     def makeLeftLinealTree(self, ls):
         return Tree.makeLLTree(ls)
 
-
-if __name__ == '__main__':
-    from mulder.molecule.MTManager import Arango
-    for q in os.listdir("/home/kemele/git/Ontario/testqueries/bsbm/"):
-        print "============", q, "=================="
-        query = open("/home/kemele/git/Ontario/testqueries/bsbm/"+q).read()
-        config = Arango("/home/kemele/git/Ontario/config/bsbm.json")
-        dc = MediatorDecomposer(query, config)
-        print dc.decompose()
+#
+# if __name__ == '__main__':
+#     from mulder.molecule.MTManager import Arango
+#     for q in os.listdir("/home/kemele/git/Ontario/testqueries/bsbm/"):
+#         print "============", q, "=================="
+#         query = open("/home/kemele/git/Ontario/testqueries/bsbm/"+q).read()
+#         config = Arango("/home/kemele/git/Ontario/config/bsbm.json")
+#         dc = MediatorDecomposer(query, config)
+#         print dc.decompose()

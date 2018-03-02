@@ -2,7 +2,9 @@ from __future__ import division
 __author__ = 'kemele'
 
 import urllib
-import httplib
+import urllib.parse as urlparse
+import http.client as htclient
+from http import HTTPStatus
 import json
 
 from multiprocessing import Process, Queue, active_children
@@ -154,8 +156,8 @@ class MediatorPlanner(object):
                             n = TreePlan(Xfilter(f), n.vars, n)
                     return n
             else:
-                print "tree.service" + str(type(tree.service)) + str(tree.service)
-                print "Error Type not considered"
+                print ("tree.service" + str(type(tree.service)) + str(tree.service))
+                print ("Error Type not considered")
 
         elif isinstance(tree, Node):
             left_subtree = self.includePhysicalOperators(tree.left)
@@ -603,26 +605,20 @@ def contactSourceAux(referer, server, path, port, query, queue):
         server = server.replace('0.0.0.0', 'localhost')
     # Build the query and header.
     # params = urllib.urlencode({'query': query})
-    params = urllib.urlencode({'query': query, 'format': json})
+    params = urlparse.urlencode({'query': query, 'format': json})
     headers = {"Accept": "*/*", "Referer": referer, "Host": server}
 
-    # Establish connection and get response from server.
-    conn = httplib.HTTPConnection(server)
-    # conn.set_debuglevel(1)
-    if len(path) > 0:
-        conn.request("GET", "/" + path + "?" + params, None, headers)
-    else:
-        conn.request("GET", "?" + params, None, headers)
+    js = "application/sparql-results+json"
+    params = {'query': query, 'format': js}
+    headers = {"User-Agent": "mulder", "Accept": js}
+    import requests
 
-    response = conn.getresponse()
-
-    # print response.status
-    if (response.status == httplib.OK):
-        res = response.read()
-        res = res.replace("false", "False")
+    resp = requests.get(referer, params=params, headers=headers)
+    if resp.status_code == HTTPStatus.OK:
+        res = resp.text.replace("false", "False")
         res = res.replace("true", "True")
-        # print "raw results from endpoint", res
         res = eval(res)
+        reslist = []
 
         if type(res) == dict:
             b = res.get('boolean', None)
@@ -630,7 +626,7 @@ def contactSourceAux(referer, server, path, port, query, queue):
             if 'results' in res:
                 # print "raw results from endpoint", res
                 for x in res['results']['bindings']:
-                    for key, props in x.iteritems():
+                    for key, props in x.items():
                         # Handle typed-literals and language tags
                         suffix = ''
                         if (props['type'] == 'typed-literal'):
@@ -653,8 +649,7 @@ def contactSourceAux(referer, server, path, port, query, queue):
                     #queue.put(elem)
 
         else:
-            print ("the source " + str(server) + " answered in " + response.getheader(
-                "content-type") + " format, instead of"
+            print ("the source " + str(server) + " answered in " + res.getheader("content-type") + " format, instead of"
                    + " the JSON format required, then that answer will be ignored")
     # print "b - ", b
     # print server, query, len(reslist)

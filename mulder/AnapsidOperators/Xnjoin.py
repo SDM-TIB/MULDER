@@ -9,7 +9,7 @@ The intermediate results are represented in a queue.
 from multiprocessing import Queue
 from time import time
 from mulder.Operators.Join import Join
-from OperatorStructures import Record, RJTTail
+from .OperatorStructures import Record, RJTTail
 
 class Xnjoin(Join):
 
@@ -103,7 +103,7 @@ class Xnjoin(Join):
 
             # Contact the source.
             qright = Queue()
-            print "instances: "+str(instances)
+            # print "instances: "+str(instances)
             self.right.execute(self.vars, instances, qright)
 
             # Get the tuples from right queue.

@@ -9,7 +9,7 @@ The intermediate results are represented in a queue.
 from multiprocessing import Queue
 from time import time
 from mulder.Operators.Optional import Optional
-from OperatorStructures import Record, RJTTail
+from .OperatorStructures import Record, RJTTail
 
 class Xnoptional(Optional):
 

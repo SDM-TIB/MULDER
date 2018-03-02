@@ -13,12 +13,12 @@ Date: January 29th, 2014
 from multiprocessing import Queue, Process
 from time import time
 import string, sys
-from Queue import Empty
+from multiprocessing.queues import Empty
 from mulder.Operators.Join import Join
 #from ontario.mediator.decomposer.Tree import Leaf, Node
 from mulder.common.parser import queryParser as qp
-from OperatorStructures import Table, Partition, Record
-from NestedHashJoin import NestedHashJoin
+from .OperatorStructures import Table, Partition, Record
+from .NestedHashJoin import NestedHashJoin
 
 WINDOW_SIZE = 10
 

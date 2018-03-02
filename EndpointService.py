@@ -55,7 +55,7 @@ def sparql():
                     break
 
                 vars = r.keys()
-                print r
+                #print(r)
                 res.append(r)
                 i += 1
 

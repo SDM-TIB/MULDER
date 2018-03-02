@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 import urllib
-import httplib
+import urllib.parse as urlparse
+import http.client as htclient
+from http import HTTPStatus
+import requests
 import json
 import pprint
 import os
@@ -127,7 +130,7 @@ def get_concepts(endpoint, limit=-1):
             # print 'number of requests: ', numrequ
             if card == -2:
                 limit = limit / 2
-                print 'limit:', limit
+                # print ('limit:', limit)
                 if limit == 0:
                     break
                 continue
@@ -360,19 +363,16 @@ def contactSource(qeury, referer, server, path):
     params = urllib.urlencode(params)
     headers = {"Accept": "*/*", "Referer": referer, "Host": server}
     try:
-        conn = httplib.HTTPConnection(server)
-        conn.request("GET", "/" + path + "?" + params, None, headers=headers)
-        response = conn.getresponse()
-        reslist = []
-        if response.status == httplib.OK:
-            ress = response.read()
+        resp = requests.get(server, params=params, headers=headers)
+        if resp.status_code == HTTPStatus.OK:
+            ress = resp.read()
             res = ress
             try:
                 res = ress.replace("false", "False")
                 res = res.replace("true", "True")
                 res = eval(res)
             except Exception as ex:
-                print "EX processing res", ex
+                print ("EX processing res", ex)
 
             if type(res) is dict:
                 if "results" in res:
@@ -392,7 +392,7 @@ def contactSource(qeury, referer, server, path):
                     return res['boolean'], 1
 
         else:
-            print ("Endpoint->", referer, response.reason, response.status, qeury)
+            print ("Endpoint->", referer, resp.reason, resp.status_code, qeury)
 
     except Exception as e:
         print ("Exception during query execution to", referer, ': ', e)
@@ -427,8 +427,8 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
     numrequ = 0
     checked_inst = []
     links_found = []
-    print "Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2
-    print '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+    print ("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
+    print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     while True:
         query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
         res, card = contactSource(query_copy, referer, server, path)
@@ -455,7 +455,7 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
                 if exists:
                     reslist.append(c['rootType'])
                     links_found.append(c['rootType'])
-                    print rootType, ',', pred, '->', c['rootType']
+                    print (rootType, ',', pred, '->', c['rootType'])
             reslist = list(set(reslist))
 
         if card < limit:
@@ -477,10 +477,10 @@ def link_exist(s, c, endpoint):
     (server, path) = server.split("/", 1)
     res, card = contactSource(query, referer, server, path)
     if res is None:
-        print 'bad request on, ', s, c
+        print ('bad request on, ', s, c)
     if card > 0:
         if res:
-            print "ASK result", res, endpoint
+            print ("ASK result", res, endpoint)
         return res
 
     return False
@@ -641,7 +641,7 @@ def get_single_source_rdfmts(enpointmaps):
                 json.dump(rdfmols, f)
                 f.close()
         except Exception as e:
-            print "WARN: exception while writing single source molecules:", endpoint, e.message
+            print ("WARN: exception while writing single source molecules:", endpoint, e.message)
 
     return rdfmolecules
 
@@ -696,7 +696,7 @@ def usage():
                  "\t<output-path> - output filename or URL for sparql endpoint with update support\n"
                  "\t<isFromFile>  - set this flag = 1 if single source MTs are already stored in a folder")
 
-    print usage_str.format(program=sys.argv[0]),
+    print (usage_str.format(program=sys.argv[0]),)
 
 
 def endpointsAccessible(endpoints):
@@ -757,7 +757,7 @@ if __name__ == "__main__":
 
     molecules = combine_single_source_descriptions(rdfmts)
     print("Inter-link extraction finished!")
-    print "Total Number of endpoints =", len(molecules)
+    print ("Total Number of endpoints =", len(molecules))
 
     with open(pathToOutput, 'w+') as f:
         json.dump(molecules, f)

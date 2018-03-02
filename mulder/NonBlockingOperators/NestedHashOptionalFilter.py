@@ -13,10 +13,10 @@ Date: January 29th, 2014
 from multiprocessing import Queue, Process
 from time import time
 import string, sys
-from Queue import Empty
+from multiprocessing.queues import Empty
 from mulder.Operators.Optional import Optional
 #from ontario.mediator.decomposer.Tree import Leaf, Node
-from OperatorStructures import Table, Partition, Record
+from .OperatorStructures import Table, Partition, Record
 
 
 WINDOW_SIZE = 10

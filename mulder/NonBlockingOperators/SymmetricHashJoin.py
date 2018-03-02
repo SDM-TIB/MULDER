@@ -9,7 +9,7 @@ The intermediate results are represented as queues.
 from multiprocessing import Queue
 from time import time
 from mulder.Operators.Join import Join
-from OperatorStructures import Table, Partition, Record
+from .OperatorStructures import Table, Partition, Record
 
 
 class SymmetricHashJoin(Join):

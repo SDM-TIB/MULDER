@@ -36,7 +36,7 @@ class Table(object):
     '''
     def __init__(self):
         self.size = 3
-        self.partitions = [Partition() for x in xrange(self.size)]
+        self.partitions = [Partition() for x in range(self.size)]
 
     def getSize(self):
         return self.size

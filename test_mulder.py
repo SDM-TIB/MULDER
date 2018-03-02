@@ -35,7 +35,7 @@ def conclude(res, p2, printResults, traces=True):
     if printResults:
         if (ri == "EOF"):
             nexttime(time1)
-            print "Empty set."
+            print("Empty set.")
             printInfo()
             return
 
@@ -46,7 +46,7 @@ def conclude(res, p2, printResults, traces=True):
                 t1 = time2
                 c1 = 1
 
-            print ri
+            print(ri)
             if traces:
                 nexttime(time1)
                 printtraces()
@@ -83,7 +83,7 @@ def printInfo():
         tn = time() - time1
     l = (qname + "\t" + str(dt) + "\t" + str(pt) + "\t" + str(t1) + "\t" + str(tn) + "\t" + str(c1) + "\t" + str(cn))
 
-    print l
+    print (l)
 
 
 def printtraces():
@@ -92,7 +92,7 @@ def printtraces():
         tn = time() - time1
     l = (qname + "," + "MULDER," + str(cn) + "," + str(tn))
 
-    print l
+    print (l)
 
 
 def onSignal1(s, stackframe):
@@ -154,7 +154,7 @@ def usage():
                  "\t<isstring> - (Optional) set if <query> is sent as string: \n"
                  "\t\tavailable values 1 or -1. -1 is default, meaning query is from file\n")
 
-    print usage_str.format(program=sys.argv[0]),
+    print (usage_str.format(program=sys.argv[0]),)
 
 
 if __name__ == '__main__':
@@ -188,25 +188,25 @@ if __name__ == '__main__':
     qname = "Q"
     time1 = time()
     dc = MediatorDecomposer(queryss, config, tempType, joinstarslocally)
-    print 'Query:', queryss
+    print ('Query:', queryss)
 
     quers = dc.decompose()
     dt = time() - time1
     #print type(quers)
-    print "Decomposed qeury:", quers
-    print "======================================================="
+    print ("Decomposed qeury:", quers)
+    print ("=======================================================")
     if quers is None:
-        print "Query decomposer returns None"
+        print ("Query decomposer returns None")
         exit()
 
     planner = MediatorPlanner(quers, True, contactsparqlendpoint, None, config)
     plan = planner.createPlan()
     pt = time() - time1
-    print "Query execution Plan:", plan
+    print ("Query execution Plan:", plan)
 
     output = Queue()
     #plan.execute(output)
-    print "*+*+*+*+*+*+*+*+*+*+*+*+Result*+*+*+*+*+*+*+++++"
+    print ("*+*+*+*+*+*+*+*+*+*+*+*+Result*+*+*+*+*+*+*+++++")
     i = 0
     p2 = Process(target=plan.execute, args=(output,))
     p2.start()

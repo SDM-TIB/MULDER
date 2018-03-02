@@ -103,57 +103,61 @@ class ConfigFile(Config):
         return wrappers
 
     def readJsonFile(self, configfile):
-        with open(configfile) as f:
-            conf = json.load(f)
+        try:
+            with open(configfile) as f:
+                conf = json.load(f)
 
-        if 'MoleculeTemplates' not in conf:
+            if 'MoleculeTemplates' not in conf:
+                return None
+            moleculetemps = conf['MoleculeTemplates']
+            meta = {}
+            for mt in moleculetemps:
+                if mt['type'] == 'filepath':
+                    with open(mt['path']) as f:
+                        mts = json.load(f)
+
+                    for m in mts:
+                        if m['rootType'] in meta:
+                            # linkedTo
+                            links = meta[m['rootType']]['linkedTo']
+                            links.extend(m['linkedTo'])
+                            meta[m['rootType']]['linkedTo'] = list(set(links))
+
+                            # predicates
+                            preds = meta[m['rootType']]['predicates']
+                            mpreds = m['predicates']
+                            ps = {p['predicate']: p for p in preds}
+                            for p in mpreds:
+                                if p['predicate'] in ps and len(p['range']) > 0:
+                                    ps[p['predicate']]['range'].extend(p['range'])
+                                    ps[p['predicate']]['range'] = list(set(ps[p['predicate']]['range']))
+                                else:
+                                    ps[p['predicate']] = p
+
+                            meta[m['rootType']]['predicates'] = []
+                            for p in ps:
+                                meta[m['rootType']]['predicates'].append(ps[p])
+
+                            # wrappers
+                            wraps = meta[m['rootType']]['wrappers']
+                            wrs = {w['url']+w['wrapperType']: w for w in wraps}
+                            mwraps = m['wrappers']
+                            for w in mwraps:
+                                key = w['url'] + w['wrapperType']
+                                if key in wrs:
+                                    wrs[key]['predicates'].extend(wrs['predicates'])
+                                    wrs[key]['predicates'] = list(set(wrs[key]['predicates']))
+
+                            meta[m['rootType']]['wrappers'] = []
+                            for w in wrs:
+                                meta[m['rootType']]['wrappers'].append(wrs[w])
+                        else:
+                            meta[m['rootType']] = m
+            f.close()
+            return meta
+        except Exception as e:
+            print("Exception while reading molecule templates file:", e)
             return None
-        moleculetemps = conf['MoleculeTemplates']
-        meta = {}
-        for mt in moleculetemps:
-            if mt['type'] == 'filepath':
-                with open(mt['path']) as f:
-                    mts = json.load(f)
-
-                for m in mts:
-                    if m['rootType'] in meta:
-                        # linkedTo
-                        links = meta[m['rootType']]['linkedTo']
-                        links.extend(m['linkedTo'])
-                        meta[m['rootType']]['linkedTo'] = list(set(links))
-
-                        # predicates
-                        preds = meta[m['rootType']]['predicates']
-                        mpreds = m['predicates']
-                        ps = {p['predicate']: p for p in preds}
-                        for p in mpreds:
-                            if p['predicate'] in ps and len(p['range']) > 0:
-                                ps[p['predicate']]['range'].extend(p['range'])
-                                ps[p['predicate']]['range'] = list(set(ps[p['predicate']]['range']))
-                            else:
-                                ps[p['predicate']] = p
-
-                        meta[m['rootType']]['predicates'] = []
-                        for p in ps:
-                            meta[m['rootType']]['predicates'].append(ps[p])
-
-                        # wrappers
-                        wraps = meta[m['rootType']]['wrappers']
-                        wrs = {w['url']+w['wrapperType']: w for w in wraps}
-                        mwraps = m['wrappers']
-                        for w in mwraps:
-                            key = w['url'] + w['wrapperType']
-                            if key in wrs:
-                                wrs[key]['predicates'].extend(wrs['predicates'])
-                                wrs[key]['predicates'] = list(set(wrs[key]['predicates']))
-
-                        meta[m['rootType']]['wrappers'] = []
-                        for w in wrs:
-                            meta[m['rootType']]['wrappers'].append(wrs[w])
-                    else:
-                        meta[m['rootType']] = m
-        f.close()
-        return meta
 
 
 #
@@ -206,17 +210,17 @@ class ConfigFile(Config):
 #         return conff
 #
 
-
-if __name__ == "__main__":
-    print "hello"
-    arr = ConfigFile("/home/kemele/git/Ontario/config/bsbm.json")
-    print "initialized"
-    preds = ["http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric1", "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature"]
-    print arr.findbypreds(preds)
-    exit()
-    for t in arr.metadata:
-        print t
-        print "\t", arr.metadata[t]['linkedTo']
-        print '\t', arr.metadata[t]['predicates']
-        print '\t', arr.metadata[t]['wrappers']
-    print len(arr.metadata)
+#
+# if __name__ == "__main__":
+#     print "hello"
+#     arr = ConfigFile("/home/kemele/git/Ontario/config/bsbm.json")
+#     print "initialized"
+#     preds = ["http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productPropertyNumeric1", "http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/vocabulary/productFeature"]
+#     print arr.findbypreds(preds)
+#     exit()
+#     for t in arr.metadata:
+#         print t
+#         print "\t", arr.metadata[t]['linkedTo']
+#         print '\t', arr.metadata[t]['predicates']
+#         print '\t', arr.metadata[t]['wrappers']
+#     print len(arr.metadata)

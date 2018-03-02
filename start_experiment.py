@@ -127,7 +127,7 @@ def conclude(res, p2, printResults, traces=True):
     if printResults:
         if ri == "EOF":
             nexttime(time1)
-            print "Empty set."
+            print ("Empty set.")
             printInfo()
             return
 
@@ -138,7 +138,7 @@ def conclude(res, p2, printResults, traces=True):
                 t1 = time2
                 c1 = 1
 
-            print ri
+            print(ri)
             if traces:
                 nexttime(time1)
                 printtraces()
@@ -190,7 +190,7 @@ def printInfo():
         tn = time() - time1
     lr = (qname + "," + str(dt) + "," + str(pt) + "," + str(t1) + "," + str(tn) + "," + str(c1) + "," + str(cn))
 
-    print lr
+    print (lr)
     logger.info(lr)
     resulttime.write('\n' + lr)
 
@@ -267,7 +267,7 @@ def usage():
                  +"\n where \n<isEndpoint> - a boolean value "
                  +"\n<result_folder> - an existing folder to store results.csv and traces.csv"
                   "\n")
-    print usage_str.format(program=sys.argv[0]),
+    print (usage_str.format(program=sys.argv[0]),)
 
 
 def main(argv):
@@ -277,7 +277,7 @@ def main(argv):
     try:
         runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, result_folder)
     except Exception as ex:
-        print ex
+        print (ex)
 
 
 if __name__ == '__main__':

@@ -8,12 +8,12 @@ The intermediate results are represented as a queue.
 '''
 import signal
 from multiprocessing import Queue
-from Queue import Empty
+from multiprocessing.queues import Empty
 from time import time
 from tempfile import NamedTemporaryFile
 from os import remove
 from mulder.Operators.Join import Join
-from OperatorStructures import Record, RJTTail, FileDescriptor
+from .OperatorStructures import Record, RJTTail, FileDescriptor
 
 class Xgjoin(Join):
 
@@ -77,7 +77,7 @@ class Xgjoin(Join):
                     # Empty: in tuple1 = self.left.get(False), when the queue is empty.
                     pass
                 except TypeError as te:
-                    print "TypeError: in resource = resource + tuple[var]", tuple, te
+                    print ("TypeError: in resource = resource + tuple[var]", tuple, te)
                     # TypeError: in resource = resource + tuple[var], when the tuple is "EOF".
                     pass
                 except IOError:
@@ -98,7 +98,7 @@ class Xgjoin(Join):
                     # Empty: in tuple2 = self.right.get(False), when the queue is empty.
                     pass
                 except TypeError as te:
-                    print "TypeError: in resource = resource + tuple[var]", tuple, te
+                    print ("TypeError: in resource = resource + tuple[var]", tuple, te)
                     # TypeError: in resource = resource + tuple[var], when the tuple is "EOF".
                     pass
                 except IOError:

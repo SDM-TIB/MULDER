@@ -25,7 +25,7 @@ logical_connectives = {
 
 arithmetic_operators = {
         '*'  : operator.mul,
-        '/'  : operator.div,
+        '/'  : operator.truediv,
         '+'  : operator.add,
         '-'  : operator.sub, 
          }
@@ -49,19 +49,19 @@ data_types = {
         'dateTime' : (datetime, datetime),
         'nonPositiveInteger' : (int, 'numerical'),
         'negativeInteger' : (int, 'numerical'),
-        'long'    : (long, 'numerical'),
+        'long'    : (int, 'numerical'),
         'int'     : (int, 'numerical'),
         'short'   : (int, 'numerical'),
         'byte'    : (bytes, bytes),
         'nonNegativeInteger' : (int, 'numerical'),
-        'unsignedLong' : (long, 'numerical'),
+        'unsignedLong' : (int, 'numerical'),
         'unsignedInt'  : (int, 'numerical'),
         'unsignedShort' : (int, 'numerical'),
         'unsignedByte' : (bytes, bytes), # TODO: this is not correct
         'positiveInteger' : (int, 'numerical')
         }
 
-numerical = (int, long, float)
+numerical = (int, int, float)
 
 class Xfilter(object):
     
@@ -116,8 +116,10 @@ class Xfilter(object):
             
     
     # Inductive case.
-    def evaluateComplexExpression(self, tuple, operator, (expr_left,type_left), (expr_right,type_right)):
+    def evaluateComplexExpression(self, tuple, operator, left, right):
+        (expr_left, type_left), (expr_right, type_right) = left, right
         # Case 1: Inductive case binary operator OP(Expr, Expr)
+        res = None
         if isinstance(expr_left, Expression) and isinstance(expr_right, Expression):
             #print "Case 1"
             res_left = self.evaluateComplexExpression(tuple, expr_left.op, (expr_left.left, type_left), (expr_left.right, type_right))
@@ -232,7 +234,8 @@ class Xfilter(object):
         return (False, None)
     
     
-    def evaluateUnaryOperator(self, operator, (expr_left, type_left)):
+    def evaluateUnaryOperator(self, operator, left):
+        (expr_left, type_left) = left
  
         if (operator == '+' and isinstance(expr_left, numerical)):
             return (expr_left, type_left)
@@ -251,7 +254,8 @@ class Xfilter(object):
             raise SPARQLTypeError
     
     
-    def evaluateLogicalConnective(self, operator, (expr_left, type_left), (expr_right, type_right)):
+    def evaluateLogicalConnective(self, operator,left, right):
+        (expr_left, type_left), (expr_right, type_right) = left, right
 
         (isEBV_left, ebv_left) = self.evaluateEBV(expr_left, type_left)
         (isEBV_right, ebv_right) = self.evaluateEBV(expr_right, type_right)
@@ -276,25 +280,27 @@ class Xfilter(object):
             else:
                 return (res, bool)
     
-    def evaluateTest(self, operator, (expr_left, type_left), (expr_right, type_right)):
+    def evaluateTest(self, operator, left, right):
+        (expr_left, type_left), (expr_right, type_right) = left, right
         if ((type(expr_left) == type(expr_right)) or (isinstance(expr_left, numerical) and isinstance(expr_right, numerical))):
             #print "Here", val_left, type_left, val_right, type_right
             return (test_operators[operator](expr_left, expr_right), bool)
         else:
-	    try:
-		if isinstance(expr_left, numerical):
-			ltyp = type(expr_left)
-			expr_right = ltyp(expr_right)
-		elif isinstance(expr_right, numerical):
-			rtype = type(expr_right)
-			expr_left = rtype(expr_left)
-		return (test_operators[operator](expr_left, expr_right), bool)
-	    except:
-            	print "SPARQLTypeError - in Xfilter"
-            	raise SPARQLTypeError
+            try:
+                if isinstance(expr_left, numerical):
+                    ltyp = type(expr_left)
+                    expr_right = ltyp(expr_right)
+                elif isinstance(expr_right, numerical):
+                    rtype = type(expr_right)
+                    expr_left = rtype(expr_left)
+                return (test_operators[operator](expr_left, expr_right), bool)
+            except:
+                    print ("SPARQLTypeError - in Xfilter")
+                    raise SPARQLTypeError
     
     
-    def evaluateAritmethic(self, operator, (expr_left, type_left), (expr_right, type_right)):
+    def evaluateAritmethic(self, operator, left, right):
+        (expr_left, type_left), (expr_right, type_right) = left, right
         #print "evaluateAritmethic(), ", expr_left, expr_right, operator, type(expr_left), type(expr_right), expr_right, type_left, type_right
 
         if (isinstance(expr_left, numerical) and isinstance(expr_right, numerical)):

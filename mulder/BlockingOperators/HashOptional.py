@@ -9,7 +9,7 @@ work until all the tuples are arrived.
 '''
 from time import time
 from mulder.Operators.Optional import Optional
-from OperatorStructures import Table, Record
+from .OperatorStructures import Table, Record
 
 class HashOptional(Optional):
 
