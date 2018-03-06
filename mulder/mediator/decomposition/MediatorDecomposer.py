@@ -203,7 +203,7 @@ class MediatorDecomposer(object):
         molConn = self.getMTsConnection(selectedmolecules)
         results = []
         res = self.pruneMTs(conn, molConn, selectedmolecules, stars)
-        print(res)
+        # print(res)
         qpl0 = []
         qpl1 = []
         for s in res:

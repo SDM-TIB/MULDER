@@ -2,7 +2,7 @@
   "MoleculeTemplates": [
     {
        "type": "filepath",
-       "path":"templates/lslod-templates.json"
+       "path":"templates/dbpedia-template.json"
      }
   ]
 }

@@ -31,7 +31,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults):
+def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults, result_folder):
 
     '''if isEndpoint:
         contact = contactSource
@@ -52,6 +52,13 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
     global cn
     global dt
     global pt
+    global resulttime
+    global resulttrace
+
+    resulttime = open(result_folder+"/results.csv", 'aw+')
+    # resulttime.write("qname,decompositionTime,planningTime,firstResult,overallTime,moreResults,cardinality")
+    resulttrace = open(result_folder + "/traces.csv", 'aw+')
+    # resulttrace.write("qname,cardinality,time")
 
     c1 = 0
     cn = 0
@@ -78,6 +85,9 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
         tn = time2
         pt = time2
         printInfo()
+        printtraces()
+        resulttrace.close()
+        resulttime.close()
         return
 
     planner = MediatorPlanner(new_query, adaptive, contactSource, endpointType, config)
@@ -104,13 +114,14 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
             break
 
 
-def conclude(res, p2, printResults):
+def conclude(res, p2, printResults, traces=True):
 
     signal.signal(12, onSignal2)
     global t1
     global tn
     global c1
     global cn
+    global time1
 
     ri = res.get()
 
@@ -129,6 +140,9 @@ def conclude(res, p2, printResults):
                 c1 = 1
 
             print(ri)
+            if traces:
+                nexttime(time1)
+                printtraces()
             ri = res.get(True)
 
         nexttime(time1)
@@ -137,6 +151,7 @@ def conclude(res, p2, printResults):
     else:
         if ri == "EOF":
             nexttime(time1)
+            printtraces()
             printInfo()
             return
 
@@ -147,11 +162,19 @@ def conclude(res, p2, printResults):
                 t1 = time2
                 c1 = 1
 
+            if traces:
+                nexttime(time1)
+                printtraces()
             ri = res.get(True)
 
         nexttime(time1)
         printInfo()
 
+    global resulttime
+    global resulttrace
+
+    resulttrace.close()
+    resulttime.close()
     p2.terminate()
 
 
@@ -164,12 +187,26 @@ def nexttime(time1):
 
 def printInfo():
     global tn
+    global resulttime
     if tn == -1:
         tn = time() - time1
     lr = (qname + "," + str(dt) + "," + str(pt) + "," + str(t1) + "," + str(tn) + "," + str(c1) + "," + str(cn))
 
     print(lr)
     logger.info(lr)
+    resulttime.write('\n' + lr)
+
+
+def printtraces():
+    global tn
+    global resulttrace
+
+    if tn == -1:
+        tn = time() - time1
+    l = (qname + "," + str(cn) + "," + str(tn))
+
+    #print l
+    resulttrace.write('\n' + l)
 
 
 def onSignal1(s, stackframe):
@@ -208,6 +245,7 @@ def get_options(argv):
     adaptive = True
     withoutCounts = False
     printResults = False
+    result_folder = './'
     for opt, arg in opts:
         if opt == "-h":
             usage()
@@ -221,13 +259,13 @@ def get_options(argv):
         elif opt == "-s":
             isEndpoint = arg == "True"
         elif opt == '-r':
-            printResults = eval(arg)
+            result_folder = arg
 
     if not configfile or not queryfile:
         usage()
         sys.exit(1)
 
-    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults)
+    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults, result_folder)
 
 
 def usage():
@@ -242,9 +280,9 @@ def usage():
 def main(argv):
     res = Queue()
     time1 = time()
-    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults) = get_options(argv[1:])
+    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults, result_folder) = get_options(argv[1:])
     try:
-        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults)
+        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, result_folder)
     except Exception as ex:
         print (ex)
 

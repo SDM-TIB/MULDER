@@ -5,6 +5,7 @@ __author__ = 'kemele'
 import getopt
 import string
 import sys, os, signal
+import json
 
 from multiprocessing import Process, Queue, active_children, Manager
 from time import time
@@ -34,15 +35,12 @@ def runQuery(query, configfile, tempType, isEndpoint, res, qplan, adaptive, with
     '''
 
     endpointType = 'V'
-    query = query.decode()
-    query = query.replace('+', ' ')
     logger.info("Query: " + query)
 
     config = ConfigFile(configfile)
 
     mdq = MediatorDecomposer(query, config, tempType)
     new_query = mdq.decompose()
-
     if new_query is None: # if the query could not be answered by the endpoints
         print ("EOF")
         return
@@ -56,10 +54,9 @@ def runQuery(query, configfile, tempType, isEndpoint, res, qplan, adaptive, with
     logger.info(plan)
 
     plan.execute(res)
-
     while True:
         r = res.get()
-        print(r)
+        print(json.dumps(r))
         if r == "EOF":
             break
 
