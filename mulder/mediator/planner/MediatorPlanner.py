@@ -172,7 +172,7 @@ class MediatorPlanner(object):
                         n = TreePlan(Xfilter(f), n.vars, n)
             return n
 
-    def includePhysicalOperatorJoin(self, l, r):
+    def includePhysicalOperatorJoinX(self, l, r):
         join_variables = l.vars & r.vars
         all_variables = l.vars | r.vars
         n, dependent_join = self.joinIndependentAnapsid(l, r)
@@ -195,7 +195,7 @@ class MediatorPlanner(object):
                     n.right.tree.service.limit = 10000  # Fixed value, this can be learnt in the future
         return n
 
-    def includePhysicalOperatorJoinX(self, l, r):
+    def includePhysicalOperatorJoin(self, l, r):
         join_variables = l.vars & r.vars
         all_variables = l.vars | r.vars
         # noInstantiatedLeftStar = False
