@@ -278,10 +278,11 @@ class Leaf(Tree):
 
         d = "DISTINCT "
         if (endpointType=="V"):
-             subquery = "SELECT COUNT " + d + vars_str + "  WHERE {" + subquery + "\n"+ query.filter_nested +"}"
+             subquery = "SELECT COUNT " + d + vars_str + "  WHERE {" + subquery + "\n" + query.filter_nested +"}"
         else:
-            subquery = "SELECT ( COUNT ("+d+ vars_str + ") AS ?cnt)  WHERE {" + subquery +"\n"+ query.filter_nested + "}"
-        return (self.service.endpoint, query.getPrefixes()+subquery)
+            subquery = "SELECT ( COUNT (" + d + vars_str + ") AS ?cnt)  WHERE {" + subquery + "\n" + query.filter_nested + "}"
+
+        return self.service.endpoint, query.getPrefixes() + subquery
 
     def getVars(self):
         return self.service.getVars()

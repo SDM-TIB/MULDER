@@ -2,7 +2,7 @@
   "MoleculeTemplates": [
     {
        "type": "filepath",
-       "path":"templates/dbpedia-template.json"
+       "path":"templates/bsbm100M-templates.json"
      }
   ]
 }
