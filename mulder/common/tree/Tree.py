@@ -373,13 +373,12 @@ def makeNode(l, r,filters=[]):
 
 def makeBushyTree(ss,filters=[]):
     (d, pq) = createLeafs(ss,filters)
-    heapq.heapify(pq)
+
     others = []
     while len(pq) > 1:
         done = False
-        l = heapq.heappop(pq)
-
-        lpq = heapq.nsmallest(len(pq), pq)
+        l = pq.pop(0)  # heapq.heappop(pq)
+        lpq = pq  # heapq.nsmallest(len(pq), pq)
 
         for i in range(0, len(pq)):
             r = lpq[i]
@@ -387,7 +386,7 @@ def makeBushyTree(ss,filters=[]):
             if shareAtLeastOneVar(l, r):
                 pq.remove(r)
                 n = makeNode(l, r, filters)
-                heapq.heappush(pq, n)
+                pq.insert(0, n)  # heapq.heappush(pq, n)
                 done = True
                 break
         if not done: 
