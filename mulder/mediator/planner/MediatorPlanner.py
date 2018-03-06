@@ -529,21 +529,21 @@ class IndependentOperator(object):
         self.q = None
         self.q = Queue()
 
-        self.p = Process(target=self.contact, args=(self.server, self.query_str, self.q, self.config, self.tree.service.limit,))
+        self.p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit,))
         self.p.start()
-        i = 0
-        while True:
-            # Get the next item in queue.
-            res = self.q.get(True)
-            # Put the result into the output queue.
-            #print res
-            i += 1
-            outputqueue.put(res)
-            # Check if there's no more data.
-            if res == "EOF":
-                break
-        #print self.tree.service.limit, i, "total - Independent operator done", self.query_str
-        self.p.terminate()
+        # i = 0
+        # while True:
+        #     # Get the next item in queue.
+        #     res = self.q.get(True)
+        #     # Put the result into the output queue.
+        #     #print res
+        #     i += 1
+        #     outputqueue.put(res)
+        #     # Check if there's no more data.
+        #     if res == "EOF":
+        #         break
+        # #print self.tree.service.limit, i, "total - Independent operator done", self.query_str
+        # self.p.terminate()
 
 
 def contactSource(molecule, query, queue, config, limit=-1):
@@ -597,7 +597,7 @@ def contactSourceAux(referer, server, path, port, query, queue):
 
     # Setting variables to return.
     b = None
-    reslist = []
+    reslist = 0
 
     # Formats of the response.
     json = "application/sparql-results+json"
@@ -618,7 +618,7 @@ def contactSourceAux(referer, server, path, port, query, queue):
         res = resp.text.replace("false", "False")
         res = res.replace("true", "True")
         res = eval(res)
-        reslist = []
+        reslist = 0
 
         if type(res) == dict:
             b = res.get('boolean', None)
@@ -629,20 +629,23 @@ def contactSourceAux(referer, server, path, port, query, queue):
                     for key, props in x.items():
                         # Handle typed-literals and language tags
                         suffix = ''
-                        if (props['type'] == 'typed-literal'):
-                            suffix = "^^<" + props['datatype'].encode('unicode_escape').decode(
-                                'unicode_escape').encode("utf-8") + ">"
-                        elif ("xml:lang" in props):
+                        if props['type'] == 'typed-literal':
+                            if isinstance(props['datatype'], bytes):
+                                suffix = "^^<" + props['datatype'].decode('utf-8') + ">"
+                            else:
+                                suffix = "^^<" + props['datatype'] + ">"
+                        elif "xml:lang" in props:
                             suffix = '@' + props['xml:lang']
                         try:
-                            x[key] = props['value'].encode('unicode_escape').decode('unicode_escape').encode(
-                                "utf-8") + suffix
+                            if isinstance(props['value'], bytes):
+                                x[key] = props['value'].decode('utf-8') + suffix
+                            else:
+                                x[key] = props['value'] + suffix
                         except:
                             x[key] = props['value'] + suffix
 
                     queue.put(x)
-                reslist = res['results']['bindings']
-
+                    reslist += 1
                 # Every tuple is added to the queue.
                 #for elem in reslist:
                     # print elem
@@ -655,5 +658,5 @@ def contactSourceAux(referer, server, path, port, query, queue):
     # print server, query, len(reslist)
 
     # print "Contact Source returned: ", len(reslist), ' results'
-    return (b, len(reslist))
+    return b, reslist
 
