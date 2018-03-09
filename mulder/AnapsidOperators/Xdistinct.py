@@ -16,7 +16,7 @@ class Xdistinct(object):
         self.vars  = vars
         self.bag = {} 
         
-    def execute(self, left, dummy, out):
+    def execute(self, left, dummy, out, processqueue=Queue()):
         # Executes the Xdistinct.
         self.left = left
         self.qresults = out

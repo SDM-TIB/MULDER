@@ -43,7 +43,7 @@ class NestedHashOptionalFilter(Optional):
         newvars_right = self.vars_right - set(d)
         return NestedHashOptionalFilter(newvars_left, newvars_right)
 
-    def execute(self, left_queue, right_operator, out):
+    def execute(self, left_queue, right_operator, out, processqueue=Queue()):
         #print "execute NestedHashOptionalFilter"
         self.left_queue = left_queue
         self.right_operator = right_operator

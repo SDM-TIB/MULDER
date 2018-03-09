@@ -26,7 +26,7 @@ class Xnoptional(Optional):
         newvars_right = self.vars_right - set(d.keys())
         return Xnoptional(newvars_left, newvars_right)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the Xgjoin.
         self.left     = left
         self.right    = right

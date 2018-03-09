@@ -19,7 +19,7 @@ class NestedLoopJoin(Join):
         self.results     = []
         self.vars        = vars
 
-    def execute(self, qleft, qright, out):
+    def execute(self, qleft, qright, out, processqueue=Queue()):
         # Executes the Nested Loop Join.
         self.left = []
         self.right = qright

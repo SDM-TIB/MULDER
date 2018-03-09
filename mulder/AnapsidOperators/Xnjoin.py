@@ -27,7 +27,7 @@ class Xnjoin(Join):
         newvars = self.vars - set(instantiated_vars)
         return Xnjoin(newvars)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the Xgjoin.
         self.left     = left
         self.right    = right

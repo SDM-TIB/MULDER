@@ -24,7 +24,7 @@ class SymmetricHashJoin(Join):
         newvars = self.vars - set(d.keys())
         return SymmetricHashJoin(newvars)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the Symmetric Hash Join.
         self.left     = left
         self.right    = right

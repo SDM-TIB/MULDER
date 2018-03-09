@@ -31,7 +31,7 @@ class Xunion(_Union):
         newvars_right = self.vars_right - set(instantiated_vars)
         return Xunion(newvars_left, newvars_right)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the Xunion.
         self.left = left
         self.right = right

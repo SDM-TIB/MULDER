@@ -33,7 +33,7 @@ class Xgoptional(Optional):
         newvars_right = self.vars_right - set(instantiated_vars)
         return Xgoptional(newvars_left, newvars_right)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the Xgoptional.
         self.left     = left
         self.right    = right

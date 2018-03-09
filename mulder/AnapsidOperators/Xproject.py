@@ -15,7 +15,7 @@ class Xproject(object):
         self.qresults   = Queue()
         self.vars  = vars
         
-    def execute(self, left, dummy, out):
+    def execute(self, left, dummy, out, processqueue=Queue()):
         # Executes the Xproject.
         self.left = left
         self.qresults = out

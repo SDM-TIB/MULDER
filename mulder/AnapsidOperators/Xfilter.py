@@ -71,7 +71,7 @@ class Xfilter(object):
         self.filter = filter
         
         
-    def execute(self, left, dummy, out):
+    def execute(self, left, dummy, out, processqueue=Queue()):
         # Executes the Xfilter.
         self.left = left
         self.qresults = out

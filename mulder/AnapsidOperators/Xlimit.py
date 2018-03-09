@@ -16,7 +16,7 @@ class Xlimit(object):
         self.vars  = vars
         self.limit  = int(limit)
         
-    def execute(self, left, dummy, out):
+    def execute(self, left, dummy, out, processqueue=Queue()):
         #print  "Executes the Xlimit.", self.limit
         self.left = left
         self.qresults = out

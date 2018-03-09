@@ -47,7 +47,7 @@ class Xgjoin(Join):
         newvars = self.vars - set(instantiated_vars)
         return Xgjoin(newvars)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the Xgjoin.
 
         self.left     = left

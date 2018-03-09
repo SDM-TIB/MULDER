@@ -16,7 +16,7 @@ class Xoffset(object):
         self.vars  = vars
         self.offset  = int(offset)
         
-    def execute(self, left, dummy, out):
+    def execute(self, left, dummy, out, processqueue=Queue()):
         # Executes the Xoffset.
         self.left = left
         self.qresults = out

@@ -22,6 +22,7 @@ from mulder.NonBlockingOperators.NestedHashJoin import NestedHashJoin
 
 WINDOW_SIZE = 10
 
+
 class NestedHashJoinFilter(Join):
 
     def __init__(self, vars):
@@ -38,7 +39,7 @@ class NestedHashJoinFilter(Join):
         newvars = self.vars - set(d)
         return NestedHashJoin(newvars)
 
-    def execute(self, left_queue, right_operator, out):
+    def execute(self, left_queue, right_operator, out, processqueue=Queue()):
         #print "execute NestedHashOptionalFilter"
         self.left_queue = left_queue
         self.right_operator = right_operator
@@ -73,8 +74,9 @@ class NestedHashJoinFilter(Join):
 
                         if new_right_operator.__class__.__name__ == "TreePlan":
                             self.tq = Queue()
-                            p1 = Process(target=new_right_operator.execute, args=(self.tq,))
+                            p1 = Process(target=new_right_operator.execute, args=(self.tq, processqueue,))
                             p1.start()
+                            processqueue.put(p1.pid)
                             while True:
                                 # Get the next item in queue.
                                 res = self.tq.get(True)
@@ -100,8 +102,9 @@ class NestedHashJoinFilter(Join):
                         right_queues[count] = queue
                         if new_right_operator.__class__.__name__ == "TreePlan":
                             self.tq = Queue()
-                            p1 = Process(target=new_right_operator.execute, args=(self.tq))
+                            p1 = Process(target=new_right_operator.execute, args=(self.tq, processqueue,))
                             p1.start()
+                            processqueue.put(p1.pid)
                             while True:
                                 res = self.tq.get(True)
                                 queue.put(res)

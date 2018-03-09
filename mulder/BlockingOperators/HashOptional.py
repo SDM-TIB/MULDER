@@ -10,6 +10,7 @@ work until all the tuples are arrived.
 from time import time
 from mulder.Operators.Optional import Optional
 from .OperatorStructures import Table, Record
+from multiprocessing import Queue
 
 class HashOptional(Optional):
 
@@ -28,7 +29,7 @@ class HashOptional(Optional):
         newvars_right = self.vars_right - set(d.keys())
         return HashOptional(newvars_left, newvars_right)
 
-    def execute(self, qleft, qright, out):
+    def execute(self, qleft, qright, out, processqueue=Queue()):
         # Executes the Hash Optional.
 
         self.left = []

@@ -349,30 +349,34 @@ def getResults(query, endpoint, limit=-1):
     return reslist
 
 
+def contactSource(query, referer, server, path):
+    # json = "application/sparql-results+json"
 
-def contactSource(qeury, referer, server, path):
-    json = "application/sparql-results+json"
+    # params = {'query': query, 'format': json}
+    # if 'www.ebi.ac.uk/rdf/services/sparql' in referer:
+    #     params['renderOption'] = 'JSON'
+    #     params['limit'] = 100
+    #     params['offset'] = 0
+    #     del params['format']
 
-    params = {'query': qeury, 'format': json}
-    if 'www.ebi.ac.uk/rdf/services/sparql' in referer:
-        params['renderOption'] = 'JSON'
-        params['limit'] = 100
-        params['offset'] = 0
-        del params['format']
+    # params = urllib.urlencode(params)
 
-    params = urllib.urlencode(params)
-    headers = {"Accept": "*/*", "Referer": referer, "Host": server}
+    js = "application/sparql-results+json"
+    params = {'query': query, 'format': js}
+    headers = {"Accept": js}
+
+    # headers = {"Accept": "*/*", "Referer": referer, "Host": server}
     try:
-        resp = requests.get(server, params=params, headers=headers)
+        resp = requests.get(referer, params=params, headers=headers)
         if resp.status_code == HTTPStatus.OK:
-            ress = resp.read()
-            res = ress
+            res = resp.text
+            reslist = 0
             try:
-                res = ress.replace("false", "False")
+                res = res.replace("false", "False")
                 res = res.replace("true", "True")
                 res = eval(res)
             except Exception as ex:
-                print ("EX processing res", ex)
+                print("EX processing res", ex)
 
             if type(res) is dict:
                 if "results" in res:

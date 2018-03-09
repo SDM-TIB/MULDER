@@ -40,7 +40,7 @@ class XJoin(Join):
         newvars = self.vars - set(d.keys())
         return XJoin(newvars)
 
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
         # Executes the XJoin.
         self.left     = left
         self.right    = right

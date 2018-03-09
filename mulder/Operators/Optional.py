@@ -1,10 +1,12 @@
 import abc
+from multiprocessing import Queue
+
 
 class Optional(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def execute(self, left, right, out):
+    def execute(self, left, right, out, processqueue=Queue()):
 
         return
 

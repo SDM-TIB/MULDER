@@ -8,6 +8,8 @@ The intermediate results are represented as lists.
 '''
 import itertools
 from mulder.Operators.Union import _Union
+from multiprocessing import Queue
+
 
 class Union(_Union):
 
@@ -24,7 +26,7 @@ class Union(_Union):
         newvars_right = self.vars_right - set(d.keys())
         return Union(newvars_left, newvars_right, self.distinct)
 
-    def execute(self, qleft, qright, out):
+    def execute(self, qleft, qright, out, processqueue=Queue()):
         # Executes the Union operator.
         self.left = []
         self.right = []

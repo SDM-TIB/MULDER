@@ -205,6 +205,8 @@ class MediatorPlanner(object):
         n = None
         dependent_join = False
         decided = False
+
+
         if isinstance(l, IndependentOperator) and l.tree.service.triples[0].subject.constant:
             if len(join_variables) > 0:
                     n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
@@ -344,8 +346,8 @@ class MediatorPlanner(object):
             n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
             dependent_join = True
             # print "Planner CASE 2: nested loop swapping plan", type(r)
-        elif not (lowSelectivityLeft) and lowSelectivityRight and (not (isinstance(l, TreePlan)) or not (
-                l.operator.__class__.__name__ == "NestedHashJoinFilter")) and (
+        elif not (lowSelectivityLeft) and lowSelectivityRight and (
+                not (isinstance(l, TreePlan)) or not (l.operator.__class__.__name__ == "NestedHashJoinFilter")) and (
                 not (isinstance(r, TreePlan)) or not (
                 r.operator.__class__.__name__ == "Xgjoin" or r.operator.__class__.__name__ == "NestedHashJoinFilter")):
             if (isinstance(r, TreePlan) and (set(l.vars) & set(r.operator.vars_left) != set([])) and (
@@ -360,6 +362,7 @@ class MediatorPlanner(object):
                 n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
             # print "Planner case 2.5", type(r)
         # Case 3: both operators are low selective
+
         else:
             n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
             # print "Planner CASE 3: xgjoin"
@@ -405,10 +408,9 @@ class MediatorPlanner(object):
             n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
             dependent_join = True
             # print "Planner CASE 2: nested loop swapping plan", type(r)
-        elif not (lowSelectivityLeft) and lowSelectivityRight and (not (isinstance(l, TreePlan)) or not (
-                l.operator.__class__.__name__ == "NestedHashJoinFilter")) and (
-                not (isinstance(r, TreePlan)) or not (
-                r.operator.__class__.__name__ == "Xgjoin" or r.operator.__class__.__name__ == "NestedHashJoinFilter")):
+        elif not (lowSelectivityLeft) and lowSelectivityRight and \
+                (not (isinstance(l, TreePlan)) or not (l.operator.__class__.__name__ == "NestedHashJoinFilter")) and \
+                (not (isinstance(r, TreePlan)) or not (r.operator.__class__.__name__ == "Xgjoin" or r.operator.__class__.__name__ == "NestedHashJoinFilter")):
             if (isinstance(r, TreePlan) and (set(l.vars) & set(r.operator.vars_left) != set([])) and (
                     set(l.vars) & set(r.operator.vars_right) != set([]))):
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
@@ -545,7 +547,7 @@ class TreePlan(object):
             s = s + self.right.aux(n + "  ")
         return s
 
-    def execute(self, outputqueue):
+    def execute(self, outputqueue, processqueue=Queue()):
         # Evaluates the execution plan.
         if self.left: #and this.right: # This line was modified by mac in order to evaluate unary operators
             qleft  = Queue()
@@ -556,26 +558,29 @@ class TreePlan(object):
             #print "self.right: ", self.right
             #print "self.left: ", self.left
 
-            p1 = Process(target=self.left.execute, args=(qleft,))
+            p1 = Process(target=self.left.execute, args=(qleft, processqueue, ))
             p1.start()
-
+            processqueue.put(p1.pid)
             if "Nested" in self.operator.__class__.__name__:
-                self.p3 = Process(target=self.operator.execute, args=(qleft, self.right, outputqueue,))
-                self.p3.start()
+                p3 = Process(target=self.operator.execute, args=(qleft, self.right, outputqueue, processqueue, ))
+                p3.start()
+                processqueue.put(p3.pid)
                 return
 
             # Check the right node to determine if evaluate it or not.
             if (self.right and ((self.right.__class__.__name__ == "IndependentOperator") or (self.right.__class__.__name__ == "TreePlan"))):
-                p2 = Process(target=self.right.execute, args=(qright,))
+                p2 = Process(target=self.right.execute, args=(qright, processqueue, ))
                 p2.start()
+                processqueue.put(p2.pid)
             else:
                 qright = self.right #qright.put("EOF")
 
             # Create a process for the operator node.
-            self.p = Process(target=self.operator.execute, args=(qleft, qright, outputqueue,))
+            p = Process(target=self.operator.execute, args=(qleft, qright, outputqueue, processqueue, ))
             #print "left and right "
             # Execute the plan
-            self.p.start()
+            p.start()
+            processqueue.put(p.pid)
 
 
 class IndependentOperator(object):
@@ -665,7 +670,7 @@ class IndependentOperator(object):
     def aux(self, n):
         return self.tree.aux(n)
 
-    def execute(self, outputqueue):
+    def execute(self, outputqueue, processqueue=Queue()):
 
         if self.tree.service.limit == -1:
             self.tree.service.limit = 10000 #TODO: Fixed value, this can be learnt in the future
@@ -674,8 +679,10 @@ class IndependentOperator(object):
         self.q = None
         self.q = Queue()
 
-        self.p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit,))
-        self.p.start()
+        p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit,))
+        p.start()
+        processqueue.put(p.pid)
+
         # i = 0
         # while True:
         #     # Get the next item in queue.

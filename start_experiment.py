@@ -13,6 +13,8 @@ import string
 import sys, os, signal
 
 from multiprocessing import Process, Queue, active_children, Manager
+from multiprocessing.queues import Empty
+
 from time import time
 import logging
 
@@ -85,24 +87,52 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
 
     logger.info("Plan:")
     logger.info(plan)
-
     pt = time() - time1
-    p2 = Process(target=plan.execute, args=(res,))
+    processqueue = Queue()
+
+    p2 = Process(target=plan.execute, args=(res, processqueue,))
     p2.start()
     p3 = Process(target=conclude, args=(res, p2, printResults))
     p3.start()
     signal.signal(12, onSignal1)
 
     while True:
-        if p2.is_alive() and not p3.is_alive():
-            try:
-                os.kill(p2.pid, 9)
-            except Exception as ex:
-                continue
-            break
-        elif not p2.is_alive() and not p3.is_alive():
+        if not p3.is_alive():
+            if p2.is_alive():
+                try:
+                    os.kill(p2.pid, 9)
+                except OSError as ex:
+                    print("Exception while terminating execution process", ex)
+                    continue
+            else:
+                break
+    # print('Number of sub-processes to terminate: ', processqueue.qsize())
+    while True:
+        try:
+            p = processqueue.get(False)
+            if check_pid(p):
+                try:
+                    os.kill(p, 9)
+                    # print("Process ", p, ' has been terminated')
+                except OSError as err:
+                    print("ERROR: Process ", p, ' cannot be terminated. Trying again ..', err)
+                    # processqueue.put(p)
+                    continue
+                if check_pid(p):
+                    processqueue.put(p)
+        except Empty:
             break
 
+
+def check_pid(pid):
+    """ Check For the existence of a unix pid. """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
+            
 
 def conclude(res, p2, printResults):
 

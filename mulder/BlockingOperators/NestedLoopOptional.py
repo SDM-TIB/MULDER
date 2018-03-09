@@ -26,7 +26,7 @@ class NestedLoopOptional(Optional):
         newvars_right = self.vars_right - set(d.keys())
         return NestedLoopOptional(newvars_left, newvars_right)
 
-    def execute(self, qleft, qright, out):
+    def execute(self, qleft, qright, out, processqueue=Queue()):
         # Executes the Nested Loop Optional.
         self.left = []
         self.right = qright

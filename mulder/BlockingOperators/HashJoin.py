@@ -10,6 +10,7 @@ work until all the tuples are arrived.
 from time import time
 from .OperatorStructures import Table, Record
 from mulder.Operators.Join import Join
+from multiprocessing import Queue
 
 class HashJoin(Join):
 
@@ -23,7 +24,7 @@ class HashJoin(Join):
         newvars = self.vars - set(d.keys())
         return HashJoin(newvars)
 
-    def execute(self, qleft, qright, out):
+    def execute(self, qleft, qright, out, processqueue=Queue()):
         # Executes the Hash Join.
         self.left = []
         self.right = []

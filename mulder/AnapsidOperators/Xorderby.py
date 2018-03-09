@@ -40,7 +40,7 @@ class Xorderby(object):
         self.args = args        # List of type Argument.
         #print "self.args", self.args
         
-    def execute(self, left, dummy, out):
+    def execute(self, left, dummy, out, processqueue=Queue()):
         # Executes the Xorderby.
         self.left = left
         self.qresults = out
