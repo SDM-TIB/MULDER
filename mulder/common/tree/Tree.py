@@ -387,7 +387,7 @@ def makeBushyTree(ss,filters=[]):
             if shareAtLeastOneVar(l, r):
                 pq.remove(r)
                 n = makeNode(l, r, filters)
-                pq.insert(0, n)  # heapq.heappush(pq, n)
+                pq.append(n)  # heapq.heappush(pq, n)
                 done = True
                 break
         if not done: 
