@@ -162,212 +162,31 @@ class NestedHashJoinFilter(Join):
 
     def makeInstantiation(self, filter_bag, operators):
         filter_str = ''
+        new_vars = ['?' + v for v in self.vars]  # TODO: this might be $
+        filter_str = " . ".join(map(str, operators.tree.service.filters))
+        # print "making instantiation join filter", filter_bag
+        # When join variables are more than one: FILTER ( )
+        if len(self.vars) >= 1:
+            filter_str += ' . FILTER (__expr__)'
 
-        import copy
-        operator = copy.copy(operators)
-        #print "||||||||||||||||||||||||||||||"
-        #print 'operator type ', type(operators)
-        #print operator
-        #operator = operator.copy()
-        #print "TreePlan" in operator.__class__.__name__
+            or_expr = []
+            for tuple in filter_bag:
+                and_expr = []
+                for var in self.vars:
+                    # aux = "?" + var + "==" + tuple[var]
+                    v = tuple[var]
+                    if v.find("http") == 0:  # uris must be passed between < .. >
+                        v = "<" + v + ">"
+                    else:
+                        v = '"' + v + '"'
+                    v = "?" + var + "=" + v
+                    and_expr.append(v)
 
-        if "TreePlan" in operator.__class__.__name__:
-            if operator.left and operator.left.__class__.__name__ == "TreePlan":
-                operator.left = copy.copy(operators.left)
-                if operator.left.left and operator.left.left.__class__.__name__ == "IndependentOperator":
-                    operator.left.left = copy.copy(operators.left.left)
-                    filter_str = " . ".join(map(str, operator.left.left.tree.service.filters))
-                    new_vars = ['?' + v for v in self.vars]
-                    if len(self.vars) >= 1:
-                        filter_str += ' . FILTER (__expr__)'
-
-                        or_expr = []
-                        for tuple in filter_bag:
-                            and_expr = []
-                            for var in self.vars:
-                                # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
-                                if v.find("http") == 0:  # uris must be passed between < .. >
-                                    v = "<" + v + ">"
-                                else:
-                                    v = '"' + v + '"'
-                                v = "?" + var + "=" + v
-                                and_expr.append(v)
-
-                            or_expr.append('(' + ' && '.join(and_expr) + ')')
-                        filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-                    operator.left.left = operator.left.left.instantiateFilter(set(new_vars), filter_str)
-                if operator.left.right and operator.left.right.__class__.__name__ == "IndependentOperator":
-                    operator.left.right = copy.copy(operators.left.right)
-                    filter_str = " . ".join(map(str, operator.left.right.tree.service.filters))
-                    new_vars = ['?' + v for v in self.vars]
-                    if len(self.vars) >= 1:
-                        filter_str += ' . FILTER (__expr__)'
-
-                        or_expr = []
-                        for tuple in filter_bag:
-                            and_expr = []
-                            for var in self.vars:
-                                # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
-                                if v.find("http") == 0:  # uris must be passed between < .. >
-                                    v = "<" + v + ">"
-                                else:
-                                    v = '"' + v + '"'
-                                v = "?" + var + "=" + v
-                                and_expr.append(v)
-
-                            or_expr.append('(' + ' && '.join(and_expr) + ')')
-                        filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-                    operator.left.right = operator.left.right.instantiateFilter(set(new_vars), filter_str)
-            if operator.left and operator.left.__class__.__name__ == "IndependentOperator":
-                operator.left = copy.copy(operators.left)
-                filter_str = " . ".join(map(str, operator.left.tree.service.filters))
-                new_vars = ['?' + v for v in self.vars]
-                if len(self.vars) >= 1:
-                    filter_str += ' . FILTER (__expr__)'
-
-                    or_expr = []
-                    for tuple in filter_bag:
-                        and_expr = []
-                        for var in self.vars:
-                            # aux = "?" + var + "==" + tuple[var]
-                            v = str(tuple[var])
-                            if v.find("http") == 0:  # uris must be passed between < .. >
-                                v = "<" + v + ">"
-                            else:
-                                v = '"' + v + '"'
-                            v = "?" + var + "=" + v
-                            and_expr.append(v)
-
-                        or_expr.append('(' + ' && '.join(and_expr) + ')')
-                    filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-                operator.left = operator.left.instantiateFilter(set(new_vars), filter_str)
-                #print "op left", operator.left
-            if operator.right and operator.right.__class__.__name__ == "TreePlan":
-                operator.right = copy.copy(operators.right)
-                if operator.right.left.__class__.__name__ == "IndependentOperator":
-                    operator.right.left = copy.copy(operators.right.left)
-                    filter_str = " . ".join(map(str, operator.right.left.tree.service.filters))
-                    new_vars = ['?' + v for v in self.vars]
-                    if len(self.vars) >= 1:
-                        filter_str += ' . FILTER (__expr__)'
-
-                        or_expr = []
-                        for tuple in filter_bag:
-                            and_expr = []
-                            for var in self.vars:
-                                # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
-                                if v.find("http") == 0:  # uris must be passed between < .. >
-                                    v = "<" + v + ">"
-                                else:
-                                    v = '"' + v + '"'
-                                v = "?" + var + "=" + v
-                                and_expr.append(v)
-
-                            or_expr.append('(' + ' && '.join(and_expr) + ')')
-                        filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-                    operator.right.left = operator.right.left.instantiateFilter(set(new_vars), filter_str)
-                if operator.right.right.__class__.__name__ == "IndependentOperator":
-                    operator.right.right = copy.copy(operators.right.right)
-                    filter_str = " . ".join(map(str, operator.right.right.tree.service.filters))
-                    new_vars = ['?' + v for v in self.vars]
-                    if len(self.vars) >= 1:
-                        filter_str += ' . FILTER (__expr__)'
-
-                        or_expr = []
-                        for tuple in filter_bag:
-                            and_expr = []
-                            for var in self.vars:
-                                # aux = "?" + var + "==" + tuple[var]
-                                v = str(tuple[var])
-                                if v.find("http") == 0:  # uris must be passed between < .. >
-                                    v = "<" + v + ">"
-                                else:
-                                    v = '"' + v + '"'
-                                v = "?" + var + "=" + v
-                                and_expr.append(v)
-
-                            or_expr.append('(' + ' && '.join(and_expr) + ')')
-                        filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-                    operator.right.right = operator.right.right.instantiateFilter(set(new_vars), filter_str)
-            #print type(operator)
-            if operator.right and operator.right.__class__.__name__ == "IndependentOperator":
-                operator.right = copy.copy(operators.right)
-                filter_str = " . ".join(map(str, operator.right.tree.service.filters))
-                new_vars = ['?' + v for v in self.vars]
-                if len(self.vars) >= 1:
-                    filter_str += ' . FILTER (__expr__)'
-
-                    or_expr = []
-                    for tuple in filter_bag:
-                        and_expr = []
-                        for var in self.vars:
-                            # aux = "?" + var + "==" + tuple[var]
-                            v = str(tuple[var])
-                            if v.find("http") == 0:  # uris must be passed between < .. >
-                                v = "<" + v + ">"
-                            else:
-                                v = '"' + v + '"'
-                            v = "?" + var + "=" + v
-                            and_expr.append(v)
-
-                        or_expr.append('(' + ' && '.join(and_expr) + ')')
-                    filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-                operator.right = operator.right.instantiateFilter(set(new_vars), filter_str)
-
-            return operator
-        else:
-            #for t in operator.tree.service.filters:
-            filter_str = " . ".join(map(str, operator.tree.service.filters))
-            #print "||||||||||||||||||||||||||||||"
-            new_vars = ['?'+v for v in self.vars] #TODO: this might be $
-            #print "NestedHashJoinFilter: makeInstantiattion ",new_vars
-            #print "making instantiation join filter", filter_bag
-            # When join variables are more than one: FILTER ( )
-            if len(self.vars) >= 1:
-                filter_str += ' . FILTER (__expr__)'
-
-                or_expr = []
-                for tuple in filter_bag:
-                    and_expr = []
-                    for var in self.vars:
-                        #aux = "?" + var + "==" + tuple[var]
-                        v = str(tuple[var])
-                        if v.find("http") == 0: # uris must be passed between < .. >
-                            v = "<"+v+">"
-                        else:
-                            v = '"'+v+'"'
-                        v = "?" + var + "=" + v
-                        and_expr.append(v)
-
-                    or_expr.append('(' + ' && '.join(and_expr) + ')')
-                filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
-
-            # When join variables is a singleton: FILTER ?var IN ()
-            #else:
-            #
-            #    filter_str = ' . FILTER ?' + list(self.vars)[0] + ' IN (__expr__)'
-            #
-            #    expr = []
-            #    for tuple in filter_bag:
-            #        v = tuple[list(self.vars)[0]]
-            #        if string.find(v, "http") == 0: # uris must be passed between < .. >
-            #            v = "<"+v+">"
-            #        expr.append(v)
-            #    filter_str = filter_str.replace('__expr__', ' , '.join(expr))
-
-            #print "NestedHashJoinFilter: makeInstantiattion filter expression:", filter_str
-            #print "NestedHashJoinFilter: makeInstantiattion type(operator)", type(operator)
-            #print "////////////////NEW OP////////////////////////////////////"
-
-            new_operator = operator.instantiateFilter(set(new_vars), filter_str)
-            #print "NestedHashJoinFilter: makeInstantiattion type(new_operator)", type(new_operator)
-
-            #print new_operator
-            #print "////////////////////////////////////////////////////"
-            return new_operator
+                or_expr.append('(' + ' && '.join(and_expr) + ')')
+            filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
+        new_operator = operators.instantiateFilter(set(new_vars), filter_str)
+        # print "type(new_operator)", type(new_operator)
+        return new_operator
 
     def probeAndInsert1(self, tuple, table1, table2, time):
         #print "in probeAndInsert1", tuple
