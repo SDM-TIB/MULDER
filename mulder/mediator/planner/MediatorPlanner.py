@@ -204,63 +204,82 @@ class MediatorPlanner(object):
         lowSelectivityRight = r.allTriplesLowSelectivity()
         n = None
         dependent_join = False
-        decided = False
-
 
         if isinstance(l, IndependentOperator) and l.tree.service.triples[0].subject.constant:
             if len(join_variables) > 0:
-                    n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-            else:
-                n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
-            dependent_join = True
-            decided = True
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                dependent_join = True
         elif isinstance(r, IndependentOperator) and r.tree.service.triples[0].subject.constant:
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-            else:
-                n = TreePlan(Xgjoin(join_variables), all_variables, r, l)
-            dependent_join = True
-            decided = True
-
-        if isinstance(r, TreePlan) and r.operator.__class__.__name__ == "Xunion" and isinstance(l, TreePlan) and l.operator.__class__.__name__ == "Xunion":
-            n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
-            decided = True
-
-        if not decided and isinstance(r, TreePlan) and r.operator.__class__.__name__ == "Xunion" and isinstance(r.left, IndependentOperator) and isinstance(l, TreePlan) and not l.operator.__class__.__name__ == "NestedHashJoinFilter":
-            if isinstance(l.right, IndependentOperator) and r.left.tree.service.triples[0].subject.name == l.right.tree.service.triples[0].subject.name:
-                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                 dependent_join = True
-                decided = True
-            elif isinstance(l.left, IndependentOperator) and r.left.tree.service.triples[0].subject.name == l.left.tree.service.triples[0].subject.name:
-                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-                dependent_join = True
-                decided = True
-
-        if not lowSelectivityLeft and lowSelectivityRight and not isinstance(r, TreePlan) and not decided: #
-            n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-            dependent_join = True
-        elif lowSelectivityLeft and not lowSelectivityRight and not isinstance(l, TreePlan) and not decided:
-            n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-            dependent_join = True
-        elif not decided and not lowSelectivityLeft and lowSelectivityRight and (not isinstance(l, TreePlan) or not l.operator.__class__.__name__ == "NestedHashJoinFilter" or not l.operator.__class__.__name__ == "Xunion") and (not isinstance(r, TreePlan) or not r.operator.__class__.__name__ == "Xgjoin" or r.operator.__class__.__name__ == "NestedHashJoinFilter" or not r.operator.__class__.__name__ == "Xunion"):
-            # if isinstance(r, TreePlan) and (set(l.vars) & set(r.operator.vars)) != set([]) and (set(l.vars) & set(r.operator.vars)) != set([]):
-            #     n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-            #     dependent_join = True
-            # elif isinstance(l, TreePlan) and (set(r.vars) & set(l.operator.vars)) != set([]) and (set(r.vars) & set(l.operator.vars)) != set([]):
-            #     n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-            #     dependent_join = True
-            # else:
+        elif isinstance(r, TreePlan) and r.operator.__class__.__name__ == "Xunion" and \
+                isinstance(l, TreePlan) and l.operator.__class__.__name__ == "Xunion":
+            # both are Union operators
             n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
+        elif not lowSelectivityLeft and not lowSelectivityRight and (
+                not isinstance(l, TreePlan) or not isinstance(r, TreePlan)):
+            # if both are selective and one of them (or both) are Independent Operator
+            if len(join_variables) > 0:
+                if l.constantPercentage() > r.constantPercentage():
+                    n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                    dependent_join = True
+                else:
+                    n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                    dependent_join = True
 
-        elif not decided:
+        elif not lowSelectivityLeft and lowSelectivityRight:
+            # If left is selective, if left != NHJ and right != NHJ -> NHJ (l,r)
+            if len(join_variables):
+                if not isinstance(l, TreePlan):
+                    if isinstance(r, TreePlan):
+                        if not isinstance(r.operator, NestedHashJoin):
+                            n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                            dependent_join = True
+                    else:
+                        # IF both are Independent Operators
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                        dependent_join = True
+                elif isinstance(l, TreePlan) and not isinstance(l.operator, NestedHashJoin):
+                    if not isinstance(r, TreePlan):
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                        dependent_join = True
+                    elif isinstance(r, TreePlan) and not isinstance(r.operator, NestedHashJoin):
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                        dependent_join = True
+
+        elif lowSelectivityLeft and not lowSelectivityRight:
+            # if right is selective if left != NHJ and right != NHJ -> NHJ (r,l)
+            if len(join_variables):
+                if not isinstance(r, TreePlan):
+                    if isinstance(l, TreePlan):
+                        if not isinstance(l.operator, NestedHashJoin):
+                            n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                            dependent_join = True
+                    else:
+                        # IF both are Independent Operators
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                        dependent_join = True
+                elif isinstance(r, TreePlan) and not isinstance(r.operator, NestedHashJoin):
+                    if not isinstance(l, TreePlan):
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                        dependent_join = True
+                    elif isinstance(l, TreePlan) and not isinstance(l.operator, NestedHashJoin):
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                        dependent_join = True
+
+        elif lowSelectivityLeft and lowSelectivityRight and isinstance(l, IndependentOperator) and isinstance(r,
+                                                                                                              IndependentOperator):
+            # both are non-selective and both are Independent Operators
+            n = TreePlan(Xgjoin(join_variables), all_variables, r, l)
+
+        if n is None:
             n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
 
         if n and isinstance(n.left, IndependentOperator) and isinstance(n.left.tree, Leaf):
             if (n.left.constantPercentage() <= 0.5) and not (n.left.tree.service.allTriplesGeneral()):
                 n.left.tree.service.limit = 10000  # Fixed value, this can be learnt in the future
-        # elif not decided:
-        #    n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
-        # print "n: ", n
+
         if isinstance(n.right, IndependentOperator) and isinstance(n.right.tree, Leaf):
             if not dependent_join:
                 if (n.right.constantPercentage() <= 0.5) and not (n.right.tree.service.allTriplesGeneral()):
