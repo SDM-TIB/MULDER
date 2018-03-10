@@ -30,7 +30,7 @@ class Xgjoin(Join):
         self.sourcesBlocked     = False
 
         # Main memory settings
-        self.memorySize   = 100000000        # Represents the main memory size (# tuples).OLD:Represents the main memory size (in KB).
+        self.memorySize   = 1000000000        # Represents the main memory size (# tuples).OLD:Represents the main memory size (in KB).
         self.fileDescriptor_left = {}
         self.fileDescriptor_right = {}
         self.memory_left  = 0
@@ -68,7 +68,7 @@ class Xgjoin(Join):
             if tuple1 != "EOF":
                 try:
                     tuple1 = self.left.get(False)
-                    #print "tuple1", tuple1
+                    # print "tuple1", tuple1
                     self.leftcount += 1
                     signal.alarm(self.timeoutSecondStage)
                     self.stage1(tuple1, self.left_table, self.right_table)
@@ -89,7 +89,7 @@ class Xgjoin(Join):
             if tuple2 != "EOF":
                 try:
                     tuple2 = self.right.get(False)
-                    #print "tuple2", tuple2
+                    # print "tuple2", tuple2
                     self.rightcount +=1
                     signal.alarm(self.timeoutSecondStage)
                     self.stage1(tuple2, self.right_table, self.left_table)

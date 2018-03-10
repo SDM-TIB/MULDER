@@ -162,7 +162,7 @@ class MediatorPlanner(object):
         elif isinstance(tree, Node):
             left_subtree = self.includePhysicalOperators(tree.left)
             right_subtree = self.includePhysicalOperators(tree.right)
-            if (tree.filters == []):
+            if tree.filters == []:
                 return self.includePhysicalOperatorJoin(left_subtree, right_subtree)
             else:
                 n = self.includePhysicalOperatorJoin(left_subtree, right_subtree)
@@ -222,54 +222,75 @@ class MediatorPlanner(object):
             # if both are selective and one of them (or both) are Independent Operator
             if len(join_variables) > 0:
                 if l.constantPercentage() > r.constantPercentage():
-                    n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-                    dependent_join = True
-                else:
-                    n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-                    dependent_join = True
-
-        elif not lowSelectivityLeft and lowSelectivityRight:
-            # If left is selective, if left != NHJ and right != NHJ -> NHJ (l,r)
-            if len(join_variables):
-                if not isinstance(l, TreePlan):
-                    if isinstance(r, TreePlan):
-                        if not isinstance(r.operator, NestedHashJoin):
-                            n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-                            dependent_join = True
-                    else:
-                        # IF both are Independent Operators
-                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-                        dependent_join = True
-                elif isinstance(l, TreePlan) and not isinstance(l.operator, NestedHashJoin):
                     if not isinstance(r, TreePlan):
                         n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                         dependent_join = True
-                    elif isinstance(r, TreePlan) and not isinstance(r.operator, NestedHashJoin):
-                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-                        dependent_join = True
-
-        elif lowSelectivityLeft and not lowSelectivityRight:
-            # if right is selective if left != NHJ and right != NHJ -> NHJ (r,l)
-            if len(join_variables):
-                if not isinstance(r, TreePlan):
-                    if isinstance(l, TreePlan):
-                        if not isinstance(l.operator, NestedHashJoin):
-                            n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-                            dependent_join = True
                     else:
-                        # IF both are Independent Operators
                         n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-                        dependent_join = True
-                elif isinstance(r, TreePlan) and not isinstance(r.operator, NestedHashJoin):
+                else:
                     if not isinstance(l, TreePlan):
                         n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                         dependent_join = True
-                    elif isinstance(l, TreePlan) and not isinstance(l.operator, NestedHashJoin):
-                        n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-                        dependent_join = True
+                    else:
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
 
-        elif lowSelectivityLeft and lowSelectivityRight and isinstance(l, IndependentOperator) and isinstance(r,
-                                                                                                              IndependentOperator):
+        elif not lowSelectivityLeft and lowSelectivityRight and not isinstance(r, TreePlan):
+
+            # If left is selective, if left != NHJ and right != NHJ -> NHJ (l,r)
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                dependent_join = True
+                #
+                # if not isinstance(l, TreePlan):
+                #     if isinstance(r, TreePlan):
+                #         if not isinstance(r.operator, NestedHashJoin) and not isinstance(r.operator, Xgjoin):
+                #             n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                #             dependent_join = True
+                #     else:
+                #         # IF both are Independent Operators
+                #         n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                #         dependent_join = True
+                # elif isinstance(l, TreePlan) and not isinstance(l.operator, NestedHashJoin):
+                #     if not isinstance(r, TreePlan):
+                #         n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                #         dependent_join = True
+                #     elif isinstance(r, TreePlan) and not isinstance(r.operator, NestedHashJoin) and not isinstance(r.operator, Xgjoin):
+                #         n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                #         dependent_join = True
+
+        elif lowSelectivityLeft and not lowSelectivityRight and not isinstance(l, TreePlan):
+            # if right is selective if left != NHJ and right != NHJ -> NHJ (r,l)
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                dependent_join = True
+                #
+                # if not isinstance(r, TreePlan):
+                #     if isinstance(l, TreePlan):
+                #         if not isinstance(l.operator, NestedHashJoin) and not isinstance(l.operator, Xgjoin):
+                #             n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                #             dependent_join = True
+                #     else:
+                #         # IF both are Independent Operators
+                #         n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                #         dependent_join = True
+                # elif isinstance(r, TreePlan) and not isinstance(r.operator, NestedHashJoin):
+                #     if not isinstance(l, TreePlan):
+                #         n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                #         dependent_join = True
+                #     elif isinstance(l, TreePlan) and not isinstance(l.operator, NestedHashJoin) and not isinstance(l.operator, Xgjoin):
+                #         n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                #         dependent_join = True
+        elif not lowSelectivityLeft and lowSelectivityRight and not l.__class__.__name__ == "NestedHashJoinFilter" and not (
+                r.__class__.__name__ == "NestedHashJoinFilter" or r.__class__.__name__ == "Xgjoin"):
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                dependent_join = True
+        elif lowSelectivityLeft and not lowSelectivityRight and not r.__class__.__name__ == "NestedHashJoinFilter" and not (
+                l.__class__.__name__ == "NestedHashJoinFilter" or l.__class__.__name__ == "Xgjoin"):
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                dependent_join = True
+        elif lowSelectivityLeft and lowSelectivityRight and isinstance(l, IndependentOperator) and isinstance(r, IndependentOperator):
             # both are non-selective and both are Independent Operators
             n = TreePlan(Xgjoin(join_variables), all_variables, r, l)
 
@@ -410,41 +431,69 @@ class MediatorPlanner(object):
     def joinIndependentMULDER(self, l, r):
         join_variables = l.vars & r.vars
         all_variables = l.vars | r.vars
-        noInstantiatedLeftStar = False
-        noInstantiatedRightStar = False
+        # noInstantiatedLeftStar = False
+        # noInstantiatedRightStar = False
         lowSelectivityLeft = l.allTriplesLowSelectivity()
         lowSelectivityRight = r.allTriplesLowSelectivity()
-
+        n = None
         dependent_join = False
-        # if (noInstantiatedRightStar) or ((not wc) and (l.constantPercentage() >= 0.5) and (len(join_variables) > 0) and c):
-        # Case 1: left operator is highly selective and right operator is low selective
-        if not (lowSelectivityLeft) and lowSelectivityRight and not (isinstance(r, TreePlan)):
-            n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
-            dependent_join = True
-            # print "Planner CASE 1: nested loop", type(r)
-        # Case 2: left operator is low selective and right operator is highly selective
-        elif lowSelectivityLeft and not (lowSelectivityRight) and not (isinstance(l, TreePlan)):
-            n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
-            dependent_join = True
-            # print "Planner CASE 2: nested loop swapping plan", type(r)
-        elif not (lowSelectivityLeft) and lowSelectivityRight and \
-                (not (isinstance(l, TreePlan)) or not (l.operator.__class__.__name__ == "NestedHashJoinFilter")) and \
-                (not (isinstance(r, TreePlan)) or not (r.operator.__class__.__name__ == "Xgjoin" or r.operator.__class__.__name__ == "NestedHashJoinFilter")):
-            if (isinstance(r, TreePlan) and (set(l.vars) & set(r.operator.vars_left) != set([])) and (
-                    set(l.vars) & set(r.operator.vars_right) != set([]))):
+
+        if isinstance(l, IndependentOperator) and l.tree.service.triples[0].subject.constant:
+            if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                 dependent_join = True
-            elif (isinstance(l, TreePlan) and (set(r.vars) & set(l.operator.vars_left) != set([])) and (
-                    set(r.vars) & set(l.operator.vars_right) != set([]))):
-                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+        elif isinstance(r, IndependentOperator) and r.tree.service.triples[0].subject.constant:
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                 dependent_join = True
-            else:
-                n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
-            # print "Planner case 2.5", type(r)
-        # Case 3: both operators are low selective
-        else:
+        elif isinstance(r, TreePlan) and r.operator.__class__.__name__ == "Xunion" and \
+                isinstance(l, TreePlan) and l.operator.__class__.__name__ == "Xunion":
+            # both are Union operators
             n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
-            # print "Planner CASE 3: xgjoin"
+        elif not lowSelectivityLeft and not lowSelectivityRight and (
+                not isinstance(l, TreePlan) or not isinstance(r, TreePlan)):
+            # if both are selective and one of them (or both) are Independent Operator
+            if len(join_variables) > 0:
+                if l.constantPercentage() > r.constantPercentage():
+                    if not isinstance(r, TreePlan):
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                        dependent_join = True
+                    else:
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                else:
+                    if not isinstance(l, TreePlan):
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                        dependent_join = True
+                    else:
+                        n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+
+        elif not lowSelectivityLeft and lowSelectivityRight and not isinstance(r, TreePlan):
+
+            # If left is selective, if left != NHJ and right != NHJ -> NHJ (l,r)
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                dependent_join = True
+        elif lowSelectivityLeft and not lowSelectivityRight and not isinstance(l, TreePlan):
+            # if right is selective if left != NHJ and right != NHJ -> NHJ (r,l)
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                dependent_join = True
+        elif not lowSelectivityLeft and lowSelectivityRight and not l.__class__.__name__ == "NestedHashJoinFilter" and not (
+                r.__class__.__name__ == "NestedHashJoinFilter" or r.__class__.__name__ == "Xgjoin"):
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
+                dependent_join = True
+        elif lowSelectivityLeft and not lowSelectivityRight and not r.__class__.__name__ == "NestedHashJoinFilter" and not (
+                l.__class__.__name__ == "NestedHashJoinFilter" or l.__class__.__name__ == "Xgjoin"):
+            if len(join_variables) > 0:
+                n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
+                dependent_join = True
+        elif lowSelectivityLeft and lowSelectivityRight and isinstance(l, IndependentOperator) and isinstance(r, IndependentOperator):
+            # both are non-selective and both are Independent Operators
+            n = TreePlan(Xgjoin(join_variables), all_variables, r, l)
+
+        if n is None:
+            n = TreePlan(Xgjoin(join_variables), all_variables, l, r)
 
         if isinstance(n.left, IndependentOperator) and isinstance(n.left.tree, Leaf):
             if (n.left.constantPercentage() <= 0.5) and not (n.left.tree.service.allTriplesGeneral()):
