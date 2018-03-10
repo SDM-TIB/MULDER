@@ -10,7 +10,9 @@ import pprint
 import os
 import random
 import sys, getopt, os
-from xml.etree import cElementTree as ElementTree
+from multiprocessing import Queue, Process
+from multiprocessing.queues import Empty
+
 
 def get_rdfs_ranges(referer, server, path, p, limit=-1):
 
@@ -101,7 +103,7 @@ def find_instance_range(referer, server, path, t, p, limit=-1):
     return ranges
 
 
-def get_concepts(endpoint, limit=-1):
+def get_concepts(endpoint, limit=-1, outqueue=Queue()):
     """
     Entry point for extracting RDF-MTs of an endpoint.
     Extracts list of rdf:Class concepts and predicates of an endpoint
@@ -168,6 +170,9 @@ def get_concepts(endpoint, limit=-1):
             rn['range'] = get_rdfs_ranges(referer, server, path, pred)
             rn['r'] = find_instance_range(referer, server, path, t, pred)
             results.append(rn)
+            outqueue.put(rn)
+
+    outqueue.put('EOF')
 
     return results
 
@@ -396,7 +401,7 @@ def contactSource(query, referer, server, path):
                     return res['boolean'], 1
 
         else:
-            print ("Endpoint->", referer, resp.reason, resp.status_code, qeury)
+            print("Endpoint->", referer, resp.reason, resp.status_code, query)
 
     except Exception as e:
         print ("Exception during query execution to", referer, ': ', e)
@@ -410,6 +415,7 @@ def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2):
         for p in c['predicates']:
             reslist = get_external_links(endpoint1, c['rootType'], p['predicate'], endpoint2, rdfmt2)
             if len(reslist) > 0:
+                reslist = [r+"@"+endpoint2 for r in reslist]
                 c['linkedTo'].extend(reslist)
                 c['linkedTo'] = list(set(c['linkedTo']))
                 p['range'].extend(reslist)
@@ -431,8 +437,8 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
     numrequ = 0
     checked_inst = []
     links_found = []
-    print ("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
-    print ('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    print("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     while True:
         query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
         res, card = contactSource(query_copy, referer, server, path)
@@ -446,20 +452,22 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
         if numrequ == 500:
             break
         if card > 0:
-            rand = random.randint(0, card - 1)
-            inst = res[rand]
-            if inst['o'] in checked_inst:
-                offset += limit
-                continue
-            for c in rdfmt2:
-                if c['rootType'] in links_found:
-                    continue
-                exists = link_exist(inst['o'], c['rootType'], endpoint2)
-                checked_inst.append(inst['o'])
-                if exists:
-                    reslist.append(c['rootType'])
-                    links_found.append(c['rootType'])
-                    print (rootType, ',', pred, '->', c['rootType'])
+            # rand = random.randint(0, card - 1)
+            # inst = res[rand]
+            #
+            # if inst['o'] in checked_inst:
+            #     offset += limit
+            #     continue
+            for inst in res:
+                for c in rdfmt2:
+                    if c['rootType'] in links_found:
+                        continue
+                    exists = link_exist(inst['o'], c['rootType'], endpoint2)
+                    checked_inst.append(inst['o'])
+                    if exists:
+                        reslist.append(c['rootType'])
+                        links_found.append(c['rootType'])
+                        print(rootType, ',', pred, '->', c['rootType'])
             reslist = list(set(reslist))
 
         if card < limit:
@@ -481,10 +489,10 @@ def link_exist(s, c, endpoint):
     (server, path) = server.split("/", 1)
     res, card = contactSource(query, referer, server, path)
     if res is None:
-        print ('bad request on, ', s, c)
+        print('bad request on, ', s, c)
     if card > 0:
         if res:
-            print ("ASK result", res, endpoint)
+            print("ASK result", res, endpoint)
         return res
 
     return False
@@ -559,93 +567,126 @@ def combine_single_source_descriptions(rdfmts):
     return molecules
 
 
-def get_single_source_rdfmts(enpointmaps):
+def extractMTLs(endpoint, outqueue=Queue()):
     rdfmolecules = {}
-    for endpoint in enpointmaps:
-        #res = getResults(query, endpoint, limit=-1)
-        res = get_concepts(endpoint)
-        molecules = {}
-        for row in res:
-            if row['t'] in molecules:
-                found = False
-                for p in molecules[row['t']]['predicates']:
-                    if p['predicate'] == row['p']:
-                        ranges = []
-                        if 'range' in row and len(row['range']) > 0:
-                            ranges.extend(row['range'])
-                        if 'r' in row and len(row['r']) > 0:
-                            ranges.extend(row['r'])
-                        ranges = list(set(ranges))
-                        pranges = p['range']
-                        pranges.append(ranges)
-                        pranges = list(set(pranges))
-                        p['range'] = pranges
-
-                        links = molecules[row['t']]['linkedTo']
-                        links.append(ranges)
-                        links = list(set(links))
-
-                        molecules[row['t']]['linkedTo'] = links
-
-                        found = True
-
-                if not found:
+    res = get_concepts(endpoint)
+    molecules = {}
+    for row in res:
+        if row['t'] in molecules:
+            found = False
+            for p in molecules[row['t']]['predicates']:
+                if p['predicate'] == row['p']:
                     ranges = []
                     if 'range' in row and len(row['range']) > 0:
                         ranges.extend(row['range'])
                     if 'r' in row and len(row['r']) > 0:
                         ranges.extend(row['r'])
                     ranges = list(set(ranges))
+                    pranges = p['range']
+                    pranges.append(ranges)
+                    pranges = list(set(pranges))
+                    p['range'] = pranges
 
-                    molecules[row['t']]['predicates'].append({'predicate': row['p'], 'range': ranges})
-                    molecules[row['t']]['linkedTo'].extend(ranges)
-                    molecules[row['t']]['linkedTo'] = list(set(molecules[row['t']]['linkedTo']))
+                    links = molecules[row['t']]['linkedTo']
+                    links.append(ranges)
+                    links = list(set(links))
 
-                # this should be changed if the number of endpoints are more than one, Note: index 0
-                if row['p'] not in molecules[row['t']]['wrappers'][0]['predicates']:
-                    molecules[row['t']]['wrappers'][0]['predicates'].append(row['p'])
-            else:
-                molecules[row['t']] = {'rootType': row['t'],
-                                       'linkedTo': [],
-                                       'wrappers': [{'url': endpoint,
-                                                     'urlparam': "",
-                                                     'wrapperType': "SPARQLEndpoint",
-                                                     'predicates': [row['p']]}
-                                                    ]
-                                       }
-                found = False
-                molecules[row['t']]['predicates'] = [{'predicate': row['p'],
-                                                      'range': []}]
-                ranges =[]
+                    molecules[row['t']]['linkedTo'] = links
+
+                    found = True
+
+            if not found:
+                ranges = []
                 if 'range' in row and len(row['range']) > 0:
                     ranges.extend(row['range'])
                 if 'r' in row and len(row['r']) > 0:
                     ranges.extend(row['r'])
                 ranges = list(set(ranges))
 
-                molecules[row['t']]['predicates'] = [{'predicate': row['p'],
-                                                      'range':ranges}]
-
+                molecules[row['t']]['predicates'].append({'predicate': row['p'], 'range': ranges})
                 molecules[row['t']]['linkedTo'].extend(ranges)
                 molecules[row['t']]['linkedTo'] = list(set(molecules[row['t']]['linkedTo']))
 
-        print('=========================================================================')
-        print('----------------------', endpoint, '-------------------------------------')
-        print('=========================================================================')
+            # this should be changed if the number of endpoints are more than one, Note: index 0
+            if row['p'] not in molecules[row['t']]['wrappers'][0]['predicates']:
+                molecules[row['t']]['wrappers'][0]['predicates'].append(row['p'])
+        else:
+            molecules[row['t']] = {'rootType': row['t'],
+                                   'linkedTo': [],
+                                   'wrappers': [{'url': endpoint,
+                                                 'urlparam': "",
+                                                 'wrapperType': "SPARQLEndpoint",
+                                                 'predicates': [row['p']]}
+                                                ]
+                                   }
+            found = False
+            molecules[row['t']]['predicates'] = [{'predicate': row['p'],
+                                                  'range': []}]
+            ranges = []
+            if 'range' in row and len(row['range']) > 0:
+                ranges.extend(row['range'])
+            if 'r' in row and len(row['r']) > 0:
+                ranges.extend(row['r'])
+            ranges = list(set(ranges))
 
-        pp.pprint(molecules)
+            molecules[row['t']]['predicates'] = [{'predicate': row['p'],
+                                                  'range': ranges}]
 
-        rdfmols = []
-        for m in molecules:
-            rdfmols.append(molecules[m])
+            molecules[row['t']]['linkedTo'].extend(ranges)
+            molecules[row['t']]['linkedTo'] = list(set(molecules[row['t']]['linkedTo']))
 
-        rdfmolecules[endpoint] = rdfmols
+    print('=========================================================================')
+    print('----------------------', endpoint, '-------------------------------------')
+    print('=========================================================================')
+
+    pp.pprint(molecules)
+
+    rdfmols = []
+    for m in molecules:
+        outqueue.put(molecules[m])
+        rdfmols.append(molecules[m])
+
+    rdfmolecules[endpoint] = rdfmols
+    return rdfmolecules
+
+
+def get_single_source_rdfmts(enpointmaps, outqueue=Queue()):
+    rdfmolecules = {}
+    queues = {}
+
+    for endpoint in enpointmaps:
+        rdfmolecules[endpoint] = []
+        queue = Queue()
+        queues[endpoint] = queue
+        p = Process(target=extractMTLs, args=(endpoint, queue, ))
+        p.start()
+
+    toremove = []
+    while len(queues) > 0:
+        for endpoint in queues:
+            try:
+                queue = queues[endpoint]
+                r = queue.get(False)
+                if r != 'EOF':
+                    outqueue.put({endpoint: r})
+                    rdfmolecules[endpoint].append(r)
+                else:
+                    toremove.append(endpoint)
+            except Empty:
+                pass
+        for r in toremove:
+            del queues[r]
+
+    outqueue.put('EOF')
+
+    for endpoint in rdfmolecules:
+        rdfmols = rdfmolecules[endpoint]
         try:
             with open(enpointmaps[endpoint], 'w+') as f:
                 json.dump(rdfmols, f)
                 f.close()
         except Exception as e:
-            print ("WARN: exception while writing single source molecules:", endpoint, e.message)
+            print("WARN: exception while writing single source molecules:", endpoint, e)
 
     return rdfmolecules
 
@@ -740,16 +781,17 @@ if __name__ == "__main__":
                 sys.exit(1)
 
         rdfmts = {}
-
+        emaps = {}
         for e in endpoints:
-
             print("Parsing: ", e)
             val = e.replace('/', '_').replace(':', '_')
-            rdfmt = get_single_source_rdfmts({e: val})
-            rdfmts[e] = rdfmt
+            emaps[e] = val
+
+        rdfmts = get_single_source_rdfmts(emaps)
     else:
         rdfmts = read_rdfmts(endpointfile)
 
+    # TODO: NestedHashJoinFilter to find links between datasets
     for endpoint1 in rdfmts:
         for endpoint2 in rdfmts:
             if endpoint1 == endpoint2:
@@ -761,7 +803,7 @@ if __name__ == "__main__":
 
     molecules = combine_single_source_descriptions(rdfmts)
     print("Inter-link extraction finished!")
-    print ("Total Number of endpoints =", len(molecules))
+    print("Total Number of endpoints =", len(molecules))
 
     with open(pathToOutput, 'w+') as f:
         json.dump(molecules, f)
