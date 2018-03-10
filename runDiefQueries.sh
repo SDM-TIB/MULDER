@@ -9,7 +9,10 @@ fi
 
 for query in `ls -v $1/*`; do
     (timeout -s 12 300 start_dief_experiment.py -c $2 -q $query -r $3 -t $5 -s True ) >> $4;
-
+    # kill any remaining processes
+    # pkill -9 start_experiment.py
+    # kill -9 $(pidof start_experiment.py)
+    killall -9 --quiet start_dief_experiment.py
 done;
 
 #(timeout -s 12 300 start_experiment.py -c $2 -q $query -t $5 -s True ) 2>> $4 >> $3;

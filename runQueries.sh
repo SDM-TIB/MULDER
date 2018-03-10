@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$#" -lt 5 ]; then
-    echo "Usage: $0 [query_folder] [config_file] [result_folder] [errors_files] [Partitioning]"
+    echo "Usage: $0 [query_folder] [config_file] [result_file_name] [errors_file_name] [Partitioning]"
     exit 1
 fi
 
