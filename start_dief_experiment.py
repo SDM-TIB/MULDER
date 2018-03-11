@@ -193,8 +193,8 @@ def printInfo():
     lr = (qname + "," + str(dt) + "," + str(pt) + "," + str(t1) + "," + str(tn) + "," + str(c1) + "," + str(cn))
 
     print(lr)
-    logger.info(lr)
     resulttime.write('\n' + lr)
+    logger.info(lr)
 
 
 def printtraces():
@@ -214,14 +214,10 @@ def onSignal1(s, stackframe):
     cs = active_children()
     for c in cs:
         try:
-            os.kill(c.pid, 15)
+            os.kill(c.pid, s)
         except OSError as ex:
-            try:
-                os.kill(c.pid, 9)
-            except:
-                pass
-        continue
-    sys.exit(9)
+            continue
+    sys.exit(s)
 
 
 def onSignal2(s, stackframe):
