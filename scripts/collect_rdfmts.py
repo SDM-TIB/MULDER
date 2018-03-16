@@ -386,7 +386,7 @@ def contactSource(query, referer, server, path):
             if type(res) is dict:
                 if "results" in res:
                     for x in res['results']['bindings']:
-                        for key, props in x.iteritems():
+                        for key, props in x.items():
                             '''suffix =''
                             if props['type'] == 'typed-literal':
                                 suffix = "^^<" + props['datatype'].encode("utf-8") + ">"
@@ -394,7 +394,7 @@ def contactSource(query, referer, server, path):
                                 suffix = '@' + props['xml:lang']
                             '''
                             x[key] = props['value'].encode('utf-8')
-
+                        print(x)
                     reslist = res['results']['bindings']
                     return reslist, len(reslist)
                 else:
