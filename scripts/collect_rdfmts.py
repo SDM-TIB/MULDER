@@ -394,7 +394,7 @@ def contactSource(query, referer, server, path):
                                 suffix = '@' + props['xml:lang']
                             '''
                             x[key] = props['value'].encode('utf-8')
-                        print(x)
+
                     reslist = res['results']['bindings']
                     return reslist, len(reslist)
                 else:
