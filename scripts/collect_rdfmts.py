@@ -152,7 +152,10 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
              'http://www.w3.org/2002/07/owl#',
              'nodeID://']
     toremove = []
-    [toremove.append(r) for v in metas for r in reslist if v in r['t']]
+    # [toremove.append(r) for v in metas for r in reslist if v in r['t']]
+    for r in reslist:
+        if str(r['t']) in metas:
+            toremove.append(r)
 
     for r in toremove:
         reslist.remove(r)
@@ -355,27 +358,22 @@ def getResults(query, endpoint, limit=-1):
 
 
 def contactSource(query, referer, server, path):
-    # json = "application/sparql-results+json"
+    # Formats of the response.
+    json = "application/sparql-results+json"
+    if '0.0.0.0' in server:
+        server = server.replace('0.0.0.0', 'localhost')
+    # Build the query and header.
+    # params = urllib.urlencode({'query': query})
+    params = urlparse.urlencode({'query': query, 'format': json})
+    headers = {"Accept": "*/*", "Referer": referer, "Host": server}
 
-    # params = {'query': query, 'format': json}
-    # if 'www.ebi.ac.uk/rdf/services/sparql' in referer:
-    #     params['renderOption'] = 'JSON'
-    #     params['limit'] = 100
-    #     params['offset'] = 0
-    #     del params['format']
-
-    # params = urllib.urlencode(params)
-
-    js = "application/sparql-results+json"
-    params = {'query': query, 'format': js}
-    headers = {"Accept": js}
-
-    # headers = {"Accept": "*/*", "Referer": referer, "Host": server}
+    # js = "application/sparql-results+json"
+    # params = {'query': query, 'format': js}
     try:
         resp = requests.get(referer, params=params, headers=headers)
         if resp.status_code == HTTPStatus.OK:
             res = resp.text
-            reslist = 0
+            reslist = []
             try:
                 res = res.replace("false", "False")
                 res = res.replace("true", "True")
@@ -386,14 +384,26 @@ def contactSource(query, referer, server, path):
             if type(res) is dict:
                 if "results" in res:
                     for x in res['results']['bindings']:
-                        for key, props in x.items():
-                            '''suffix =''
+                        for key, props in x.iteritems():
+                            # Handle typed-literals and language tags
+                            suffix = ''
                             if props['type'] == 'typed-literal':
-                                suffix = "^^<" + props['datatype'].encode("utf-8") + ">"
+                                if isinstance(props['datatype'], bytes):
+                                    suffix = "^^<" + props['datatype'].decode('utf-8') + ">"
+                                else:
+                                    suffix = "^^<" + props['datatype'] + ">"
                             elif "xml:lang" in props:
                                 suffix = '@' + props['xml:lang']
-                            '''
-                            x[key] = props['value'].encode('utf-8')
+                            try:
+                                if isinstance(props['value'], bytes):
+                                    x[key] = props['value'].decode('utf-8') + suffix
+                                else:
+                                    x[key] = props['value'] + suffix
+                            except:
+                                x[key] = props['value'] + suffix
+
+                            if isinstance(x[key], bytes):
+                                x[key] = x[key].decode('utf-8')
 
                     reslist = res['results']['bindings']
                     return reslist, len(reslist)
@@ -404,7 +414,7 @@ def contactSource(query, referer, server, path):
             print("Endpoint->", referer, resp.reason, resp.status_code, query)
 
     except Exception as e:
-        print ("Exception during query execution to", referer, ': ', e)
+        print("Exception during query execution to", referer, ': ', e)
 
     return None, -2
 
