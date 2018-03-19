@@ -384,7 +384,7 @@ def contactSource(query, referer, server, path):
             if type(res) is dict:
                 if "results" in res:
                     for x in res['results']['bindings']:
-                        for key, props in x.iteritems():
+                        for key, props in x.items():
                             # Handle typed-literals and language tags
                             suffix = ''
                             if props['type'] == 'typed-literal':
