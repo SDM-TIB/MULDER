@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, request
+from flask import Flask, request, session
 from flask.json import jsonify
 import sys
 import os
@@ -18,7 +18,8 @@ __author__ = 'kemele'
 app = Flask(__name__)
 configuration = None
 tempType = "MULDER"
-configfile = 'config/config.json'
+configfile = 'defaultconfig.json'
+
 
 @app.route("/sparql", methods=['POST', 'GET'])
 def sparql():
@@ -27,13 +28,20 @@ def sparql():
             query = request.args.get("query", '')
             # query = query.replace('\n', ' ').replace('\r', ' ')
             print('query:', query)
-            configuration = ConfigFile(configfile)
+            global configuration
+            # if session['configuration'] is None:
+            #     configuration = ConfigFile(configfile)
+            # else:
+            #     configuration = session.get('configuration')
+            if configuration is None:
+                configuration = ConfigFile(configfile)
+
             start = time()
             dc = MediatorDecomposer(query, configuration, tempType)
             quers = dc.decompose()
             print ("Mediator Decomposer: \n", quers)
             if quers is None:
-                print ("Query decomposer returns None")
+                print("Query decomposer returns None")
                 return jsonify({"result": []})
 
             res = []
@@ -54,13 +62,13 @@ def sparql():
                     print ("END of results ....")
                     break
 
-                vars = r.keys()
-                #print(r)
+                vars = [k for k in r.keys()]
+                # print(r)
                 res.append(r)
                 i += 1
 
             total = time() - start
-            return jsonify({"vars": vars, "result": res, "execTime": total, "firstResult": first, "totalRows": i})
+            return jsonify(vars=vars, result=res, execTime=total, firstResult=first, totalRows=i)
         except Exception as e:
             print ("Exception: ", e)
             print ({"result": [], "error": e})
