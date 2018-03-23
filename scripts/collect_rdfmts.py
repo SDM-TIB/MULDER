@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 
 import urllib
 import urllib.parse as urlparse
@@ -154,8 +154,9 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
     toremove = []
     # [toremove.append(r) for v in metas for r in reslist if v in r['t']]
     for r in reslist:
-        if str(r['t']) in metas:
-            toremove.append(r)
+        for m in metas:
+            if m in str(r['t']):
+                toremove.append(r)
 
     for r in toremove:
         reslist.remove(r)
@@ -656,6 +657,7 @@ def extractMTLs(endpoint, outqueue=Queue()):
         outqueue.put(molecules[m])
         rdfmols.append(molecules[m])
 
+    outqueue.put('EOF')
     rdfmolecules[endpoint] = rdfmols
     return rdfmolecules
 
@@ -685,7 +687,8 @@ def get_single_source_rdfmts(enpointmaps, outqueue=Queue()):
             except Empty:
                 pass
         for r in toremove:
-            del queues[r]
+            if r in queues:
+                del queues[r]
 
     outqueue.put('EOF')
 
@@ -731,7 +734,7 @@ def get_options(argv):
         elif opt == '-f':
             isFromFile = True
 
-    if not outputType or outputType.lower() not in ['json', 'nt', 'sparql-update']:
+    if not endpointfile or not outputType or outputType.lower() not in ['json', 'nt', 'sparql-update']:
         usage()
         sys.exit(1)
 
@@ -777,7 +780,8 @@ def endpointsAccessible(endpoints):
 
 if __name__ == "__main__":
     pp = pprint.PrettyPrinter(indent=2)
-    endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
+    # endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
+    endpointfile, outputType, pathToOutput, isFromFile = "endpoint.txt", 'json', "mot.json", False
     if not isFromFile:
         with open(endpointfile, 'r') as f:
             endpoints = f.readlines()
