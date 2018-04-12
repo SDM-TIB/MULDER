@@ -13,6 +13,13 @@ import sys, getopt, os
 from multiprocessing import Queue, Process
 from multiprocessing.queues import Empty
 
+metas = [    'http://www.w3.org/ns/sparql-service-description',
+             'http://www.openlinksw.com/schemas/virtrdf#',
+             'http://www.w3.org/2000/01/rdf-schema#',
+             'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+             'http://www.w3.org/2002/07/owl#',
+             'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType',
+             'nodeID://']
 
 def get_rdfs_ranges(referer, server, path, p, limit=-1):
 
@@ -41,12 +48,7 @@ def get_rdfs_ranges(referer, server, path, p, limit=-1):
         reslist, card = contactSource(RDFS_RANGES, referer, server, path)
 
     ranges = []
-    metas = ['http://www.w3.org/ns/sparql-service-description',
-             'http://www.openlinksw.com/schemas/virtrdf#',
-             'http://www.w3.org/2000/01/rdf-schema#',
-             'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-             'http://www.w3.org/2002/07/owl#',
-             'nodeID://']
+
     for r in reslist:
         skip = False
         for m in metas:
@@ -85,13 +87,7 @@ def find_instance_range(referer, server, path, t, p, limit=-1):
         reslist, card = contactSource(INSTANCE_RANGES, referer, server, path)
 
     ranges = []
-    metas = ['http://www.w3.org/ns/sparql-service-description',
-             'http://www.openlinksw.com/schemas/virtrdf#',
-             'http://www.w3.org/2000/01/rdf-schema#',
-             'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-             'http://www.w3.org/2002/07/owl#',
-             'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType',
-             'nodeID://']
+
     for r in reslist:
         skip = False
         for m in metas:
@@ -337,12 +333,7 @@ def getResults(query, endpoint, limit=-1):
         reslist, card = contactSource(query, referer, server, path)
 
     types = set()
-    metas = ['http://www.w3.org/ns/sparql-service-description',
-             'http://www.openlinksw.com/schemas/virtrdf#',
-             'http://www.w3.org/2000/01/rdf-schema#',
-             'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-             'http://www.w3.org/2002/07/owl#',
-             'nodeID://']
+
     toremove =[]
     for r in reslist:
         ifmetas = [True for v in metas if v in r['t']]
