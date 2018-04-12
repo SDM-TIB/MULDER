@@ -136,7 +136,7 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
                 if limit == 0:
                     break
                 continue
-            if card > 1:
+            if card > 0:
                 reslist.extend(res)
             if card < limit:
                 break
@@ -240,7 +240,7 @@ def get_preds_of_random_instances(referer, server, path, t, limit=-1):
     query = " SELECT DISTINCT ?s WHERE{ ?s a <" + t + ">. } "
     reslist = []
     if limit == -1:
-        limit = 1000
+        limit = 10
         offset = 0
         numrequ = 0
         while True:
@@ -254,7 +254,7 @@ def get_preds_of_random_instances(referer, server, path, t, limit=-1):
                 if limit == 0:
                     break
                 continue
-            if numrequ == 10:
+            if numrequ == 100:
                 break
             if card > 0:
                 import random
@@ -420,7 +420,7 @@ def contactSource(query, referer, server, path):
     return None, -2
 
 
-def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2):
+def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2, q):
     # print 'between endpoints:', endpoint1, ' --> ', endpoint2
     for c in rdfmt1:
         for p in c['predicates']:
@@ -432,6 +432,7 @@ def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2):
                 p['range'].extend(reslist)
                 p['range'] = list(set(p['range']))
                 # print 'external links found for ', c['rootType'], '->', p['predicate'], reslist
+    q.put('EOF')
 
 
 def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
@@ -460,7 +461,7 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
                 break
 
             continue
-        if numrequ == 500:
+        if numrequ == 100:
             break
         if card > 0:
             # rand = random.randint(0, card - 1)
@@ -780,8 +781,8 @@ def endpointsAccessible(endpoints):
 
 if __name__ == "__main__":
     pp = pprint.PrettyPrinter(indent=2)
-    endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
-    #endpointfile, outputType, pathToOutput, isFromFile = "endpoint.txt", 'json', "mot.json", False
+    # endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
+    endpointfile, outputType, pathToOutput, isFromFile = "endpoint.txt", 'json', "motivtest.json", False
     if not isFromFile:
         with open(endpointfile, 'r') as f:
             endpoints = f.readlines()
@@ -806,14 +807,26 @@ if __name__ == "__main__":
         rdfmts = read_rdfmts(endpointfile)
 
     # TODO: NestedHashJoinFilter to find links between datasets
+    eofflags = list()
     for endpoint1 in rdfmts:
         for endpoint2 in rdfmts:
             if endpoint1 == endpoint2:
                 continue
-
+            q = Queue()
+            eofflags.append(q)
             print("Finding inter-links between:", endpoint1, ' and ', endpoint2, ' .... ')
             print("==============================//=========//===============================")
-            get_links(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2])
+            p = Process(target=get_links, args=(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2], q,))
+            p.start()
+            #get_links(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2])
+
+    while len(eofflags) > 0:
+        for q in eofflags:
+            eof = q.get()
+            if eof == 'EOF':
+                eofflags.remove(q)
+                break
+
 
     molecules = combine_single_source_descriptions(rdfmts)
     print("Inter-link extraction finished!")
