@@ -142,12 +142,7 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
         reslist, card = contactSource(query, referer, server, path)
 
     results = []
-    metas = ['http://www.w3.org/ns/sparql-service-description',
-             'http://www.openlinksw.com/schemas/virtrdf#',
-             'http://www.w3.org/2000/01/rdf-schema#',
-             'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-             'http://www.w3.org/2002/07/owl#',
-             'nodeID://']
+
     toremove = []
     # [toremove.append(r) for v in metas for r in reslist if v in r['t']]
     for r in reslist:
