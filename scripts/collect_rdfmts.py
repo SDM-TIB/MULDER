@@ -90,6 +90,7 @@ def find_instance_range(referer, server, path, t, p, limit=-1):
              'http://www.w3.org/2000/01/rdf-schema#',
              'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
              'http://www.w3.org/2002/07/owl#',
+             'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType',
              'nodeID://']
     for r in reslist:
         skip = False
