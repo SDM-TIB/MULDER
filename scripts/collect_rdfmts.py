@@ -773,8 +773,8 @@ def endpointsAccessible(endpoints):
 
 if __name__ == "__main__":
     pp = pprint.PrettyPrinter(indent=2)
-    # endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
-    endpointfile, outputType, pathToOutput, isFromFile = "endpoint.txt", 'json', "motivtest.json", False
+    endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
+    #endpointfile, outputType, pathToOutput, isFromFile = "endpoint.txt", 'json', "motivtest.json", False
     if not isFromFile:
         with open(endpointfile, 'r') as f:
             endpoints = f.readlines()
