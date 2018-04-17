@@ -817,7 +817,8 @@ if __name__ == "__main__":
 
     molecules = combine_single_source_descriptions(rdfmts)
     print("Inter-link extraction finished!")
-    print("Total Number of endpoints =", len(molecules))
+    print("Total Number of molecules =", len(molecules))
+    print("Total Number of endpoints =", len(rdfmts))
 
     with open(pathToOutput, 'w+') as f:
         json.dump(molecules, f)
