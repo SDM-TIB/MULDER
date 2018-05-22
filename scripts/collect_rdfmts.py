@@ -21,13 +21,14 @@ metas = [    'http://www.w3.org/ns/sparql-service-description',
              'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType',
              'nodeID://']
 
+
 def get_rdfs_ranges(referer, server, path, p, limit=-1):
 
     RDFS_RANGES = " SELECT DISTINCT ?range  WHERE{ <" + p + "> rdfs:range ?range. }"
 
     reslist = []
     if limit == -1:
-        limit = 10
+        limit = 50
         offset = 0
         numrequ = 0
         while True:
@@ -66,7 +67,7 @@ def find_instance_range(referer, server, path, t, p, limit=-1):
     INSTANCE_RANGES = " SELECT DISTINCT ?r WHERE{ ?s a <" + t + ">. ?s <" + p + "> ?pt.  ?pt a ?r  } "
     reslist = []
     if limit == -1:
-        limit = 10
+        limit = 50
         offset = 0
         numrequ = 0
         while True:
@@ -118,7 +119,7 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
     (server, path) = server.split("/", 1)
     reslist = []
     if limit == -1:
-        limit = 10
+        limit = 50
         offset = 0
         numrequ = 0
         while True:
@@ -187,7 +188,7 @@ def get_predicates(referer, server, path, t, limit=-1):
     query = " SELECT DISTINCT ?p WHERE{ ?s a <" + t + ">. ?s ?p ?pt. } "
     reslist = []
     if limit == -1:
-        limit = 10
+        limit = 50
         offset = 0
         numrequ = 0
         while True:
@@ -232,7 +233,7 @@ def get_preds_of_random_instances(referer, server, path, t, limit=-1):
     query = " SELECT DISTINCT ?s WHERE{ ?s a <" + t + ">. } "
     reslist = []
     if limit == -1:
-        limit = 10
+        limit = 50
         offset = 0
         numrequ = 0
         while True:
@@ -303,7 +304,7 @@ def getResults(query, endpoint, limit=-1):
     (server, path) = server.split("/", 1)
     reslist = []
     if limit == -1:
-        limit = 10
+        limit = 50
         offset = 0
         numrequ = 0
         while True:
@@ -431,7 +432,7 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
         server = endpoint1.split("http://")[1]
     (server, path) = server.split("/", 1)
     reslist = []
-    limit = 10
+    limit = 50
     offset = 0
     numrequ = 0
     checked_inst = []
@@ -814,7 +815,6 @@ if __name__ == "__main__":
                 eofflags.remove(q)
                 break
 
-
     molecules = combine_single_source_descriptions(rdfmts)
     print("Inter-link extraction finished!")
     print("Total Number of molecules =", len(molecules))
@@ -823,3 +823,5 @@ if __name__ == "__main__":
     with open(pathToOutput, 'w+') as f:
         json.dump(molecules, f)
         f.close()
+
+    exit(0)
