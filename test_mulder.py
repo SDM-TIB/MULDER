@@ -112,7 +112,7 @@ def onSignal2(s, stackframe):
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:q:c:s:")
+        opts, args = getopt.getopt(argv, "h:q:c:s:p:")
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -126,6 +126,7 @@ def get_options(argv):
     '''
     config = 'config/config.json'
     isstring = -1
+    planonly = False
     for opt, arg in opts:
         if opt == "-h":
             usage()
@@ -134,6 +135,8 @@ def get_options(argv):
             query = arg
         elif opt == "-c":
             config = arg
+        elif opt == '-p':
+            planonly = eval(arg)
 
     if not query:
         usage()
@@ -141,7 +144,7 @@ def get_options(argv):
 
     # TODO: validate file path and sparql-endpoint capability (Update capability)
 
-    return query, config, isstring
+    return query, config, isstring, planonly
 
 
 def usage():
@@ -159,14 +162,14 @@ def usage():
 
 if __name__ == '__main__':
 
-    # query, config, isstring = get_options(sys.argv[1:])
+    query, config, isstring, planonly = get_options(sys.argv[1:])
     # if isstring == 1:
     #     queryss = query.decode()
     # else:
     #     queryss = open(query).read()
     #
-    queryss = open('queries/doi').read()
-    config = 'config/pubs.json'
+    # queryss = open('queries/doi').read()
+    # config = 'config/pubs.json'
 
     config = ConfigFile(config)
     tempType = "MULDER"
@@ -187,8 +190,8 @@ if __name__ == '__main__':
     dt = -1
     qname = "Q"
     time1 = time()
-    dc = MediatorDecomposer(queryss, config, tempType, joinstarslocally)
-    print ('Query:', queryss)
+    dc = MediatorDecomposer(query, config, tempType, joinstarslocally)
+    print ('Query:', query)
 
     quers = dc.decompose()
     dt = time() - time1
@@ -202,10 +205,16 @@ if __name__ == '__main__':
     planner = MediatorPlanner(quers, True, contactsparqlendpoint, None, config)
     plan = planner.createPlan()
     pt = time() - time1
-    print ("Query execution Plan:", plan)
+    print ("Query execution Plan:")
+    if planonly:
+        print(plan)
+        print("Decomposition and Planning Time: ", pt)
+        exit(0)
+
+    print(plan)
 
     output = Queue()
-    #plan.execute(output)
+    # plan.execute(output)
     print ("*+*+*+*+*+*+*+*+*+*+*+*+Result*+*+*+*+*+*+*+++++")
     i = 0
     p2 = Process(target=plan.execute, args=(output,))

@@ -70,18 +70,19 @@ Running MULDER
 Once you installed MULDER and the Molecule Templates are ready with config.json,
 you can start running MULDER using the following script:
 
-    `$ python3.5 test_mulder.py -q <query> -c <path/to/config.json> -s <isstring>`
+    `$ python3.5 test_mulder.py -p <planonly> -q <query> -c <path/to/config.json> -s <isstring>`
  where:
 
  `<query>`:               - SPARQL QUERY
  `<path/to/config.json>`: - path to configuration file
  `<isstring>`:            - (Optional) set if <query> is sent as string: available values 1 or -1. -1 is default, meaning query is from file
+ `<planonly>`:            - (Optional) if set True, then only execution plan is generated and showed. If False (default), then the generated plan will be executed, too.
 
  Running experiments:
  ===================
 
- `$./runQueries.sh <path/to/queries-dir> <path/to/config.json> <path/to/results-folder> errors.txt MULDER &`
+ `$./runQueries.sh <path/to/queries-dir> <path/to/config.json> <path/to/results-folder> errors.txt <planonlyTorF>  &`
 
  OR
 
- `$ python3.5 start_experiment.py -c <path/to/config.json> -q <query-file> -r <path/to/results-folder> -t 'MULDER' -s True`
+ `$ python3.5 start_experiment.py -c <path/to/config.json> -q <query-file> -r <path/to/results-folder> -t 'MULDER' -s True -p <planonly> `

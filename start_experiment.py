@@ -33,7 +33,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults):
+def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults, planonly):
 
     '''if isEndpoint:
         contact = contactSource
@@ -88,6 +88,11 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
     logger.info("Plan:")
     logger.info(plan)
     pt = time() - time1
+    if planonly:
+        print(plan)
+        print("Decomposition and Planning Time: ", pt)
+        exit(0)
+
     processqueue = Queue()
 
     p2 = Process(target=plan.execute, args=(res, processqueue,))
@@ -220,7 +225,7 @@ def onSignal2(s, stackframe):
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:c:q:t:s:r:")
+        opts, args = getopt.getopt(argv, "h:c:q:t:s:r:p:")
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -234,6 +239,7 @@ def get_options(argv):
     adaptive = True
     withoutCounts = False
     printResults = False
+    planonly = False
     for opt, arg in opts:
         if opt == "-h":
             usage()
@@ -248,12 +254,14 @@ def get_options(argv):
             isEndpoint = arg == "True"
         elif opt == '-r':
             printResults = eval(arg)
+        elif opt == '-p':
+            planonly = eval(arg)
 
     if not configfile or not queryfile:
         usage()
         sys.exit(1)
 
-    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults)
+    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults, planonly)
 
 
 def usage():
@@ -268,9 +276,9 @@ def usage():
 def main(argv):
     res = Queue()
     time1 = time()
-    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults) = get_options(argv[1:])
+    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults, planonly) = get_options(argv[1:])
     try:
-        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults)
+        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, planonly)
     except Exception as ex:
         print (ex)
 
