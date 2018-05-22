@@ -1,0 +1,8 @@
+{
+  "MoleculeTemplates": [
+    {
+       "type": "filepath",
+       "path":"/MULDER/templates/dbpedia-template.json"
+     }
+  ]
+}

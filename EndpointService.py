@@ -18,7 +18,7 @@ __author__ = 'kemele'
 app = Flask(__name__)
 configuration = None
 tempType = "MULDER"
-configfile = 'defaultconfig.json'
+configfile = '/MULDER/defaultconfig.json'
 
 
 @app.route("/sparql", methods=['POST', 'GET'])
@@ -83,7 +83,7 @@ def usage():
                  + " is configuration file for Ontario "
                  + "\n")
 
-    print (usage_str.format(program=sys.argv[0]),)
+    print(usage_str.format(program=sys.argv[0]),)
 
 
 def get_options(argv):
@@ -101,8 +101,9 @@ def get_options(argv):
         elif opt == "-c":
             configfile = arg
     if not configfile:
-        usage()
-        sys.exit(1)
+        #usage()
+        #sys.exit(1)
+        configfile = '/data/config.json'
 
     return configfile
 
@@ -114,7 +115,11 @@ if __name__ == "__main__":
     argv = sys.argv
 
     configfile = get_options(argv[1:])
-    conf = ConfigFile(configfile)
+    try:
+        conf = ConfigFile(configfile)
+    except:
+        conf = ConfigFile("/MULDER/defaultconfig.json")
+        print("The default DBpedia template is loaded")
     port = 5000
     # config = json.load(open(configfile))
     configuration = conf
