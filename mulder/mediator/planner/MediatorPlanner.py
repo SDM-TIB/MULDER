@@ -5,7 +5,7 @@ import urllib
 import urllib.parse as urlparse
 import http.client as htclient
 from http import HTTPStatus
-import json
+import requests
 
 from multiprocessing import Process, Queue, active_children
 
@@ -831,7 +831,7 @@ def contactSourceAux(referer, server, path, port, query, queue):
     js = "application/sparql-results+json"
     params = {'query': query, 'format': js}
     headers = {"User-Agent": "mulder", "Accept": js}
-    import requests
+
 
     resp = requests.get(referer, params=params, headers=headers)
     if resp.status_code == HTTPStatus.OK:
