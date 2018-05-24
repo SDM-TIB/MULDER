@@ -173,6 +173,13 @@ class MediatorDecomposer(object):
             typemols = self.checkRDFTypeStatemnt(ltr)
             if len(typemols) > 0:
                 selectedmolecules[s] = typemols
+                for m in typemols:
+                    properties =[p['predicate'] for p in self.config.metadata[m]['predicates']]
+                    pinter = set(properties).intersection(preds)
+                    if len(pinter) != len(preds):
+                        print("Subquery: ", stars[s], "\nCannot be executed, because it contains properties that "
+                                                      "does not exist in this federations of datasets.")
+                        return []
                 continue
 
             if len(preds) == 0:
