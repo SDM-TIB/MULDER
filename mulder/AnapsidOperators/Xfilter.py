@@ -286,8 +286,6 @@ class Xfilter(object):
     def evaluateTest(self, operator, left, right):
         if left and right:
             (expr_left, type_left), (expr_right, type_right) = left, right
-            if test_operators[operator](expr_left, expr_right):
-                print(left, right)
         else:
             print("Exception: left or right operand None.", left, right)
             raise Exception
