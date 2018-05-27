@@ -210,7 +210,7 @@ class MediatorDecomposer(object):
         molConn = self.getMTsConnection(selectedmolecules)
         results = []
         res = self.pruneMTs(conn, molConn, selectedmolecules, stars)
-        # print(res)
+        print(res)
         qpl0 = []
         qpl1 = []
         for s in res:
@@ -236,14 +236,21 @@ class MediatorDecomposer(object):
                             qpl1.append(m)
         if qpl0 and not self.joinlocally:
             joins = {}
+            k = 0
             for s in qpl0:
                 if s.endpoint in joins:
-                    joins[s.endpoint].extend(s.triples)
+                    if self.shareAtLeastOneVar( joins[s.endpoint], s.triples):
+                        joins[s.endpoint].extend(s.triples)
+                    else:
+                        joins[s.endpoint+"|" + str(k)] = s.triples
+                        k += 1
                 else:
                     joins[s.endpoint] = s.triples
             qpl0 = []
             for e in joins:
-                qpl0.append(Service('<' + e + '>', joins[e]))
+                endp = e.split('|')[0]
+
+                qpl0.append(Service('<' + endp + '>', joins[e]))
 
         if qpl0 and qpl1:
             qpl1.insert(0, qpl0)
@@ -252,6 +259,21 @@ class MediatorDecomposer(object):
             return qpl0
         else:
             return qpl1
+
+    def shareAtLeastOneVar(self, left, right):
+        leftsubj = [s.subject.name for s in left if not s.subject.constant]
+        leftobj = [s.theobject.name for s in left if not s.subject.constant]
+        rightsubj = [s.subject.name for s in right if not s.subject.constant]
+        rightobj = [s.theobject.name for s in right if not s.subject.constant]
+
+        leftvars = leftsubj + leftobj
+        rightvars = rightsubj + rightobj
+        inter = set(leftvars).intersection(set(rightvars))
+        print (inter)
+        if len(inter) > 0:
+            return True
+
+        return False
 
     def metawrapperdecomposer(self, res, triplepatterns):
         sourceindex = dict()
