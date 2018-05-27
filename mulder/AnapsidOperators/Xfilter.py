@@ -15,7 +15,8 @@ unary_operators = {
         '!'  : operator.not_,
         '+'  : '',
         '-'  : operator.neg,
-        'bound' : lambda a: len(a) > 0
+        'bound' : lambda a: len(a) > 0,
+        'str' : str
         }
 
 logical_connectives = {
@@ -244,6 +245,8 @@ class Xfilter(object):
             return (unary_operators[operator](expr_left), type_left)
         elif (operator == 'bound'):
             return (unary_operators[operator](expr_left), type_left)
+        elif (operator == 'str'):
+            return (unary_operators[operator](expr_left), str)
         elif (operator == '!'):
             (isEBV, ebv) = self.evaluateEBV(expr_left, type_left)
             if (isEBV):
@@ -281,9 +284,15 @@ class Xfilter(object):
                 return (res, bool)
     
     def evaluateTest(self, operator, left, right):
-        (expr_left, type_left), (expr_right, type_right) = left, right
+        if left and right:
+            (expr_left, type_left), (expr_right, type_right) = left, right
+            if test_operators[operator](expr_left, expr_right):
+                print(left, right)
+        else:
+            print("Exception: left or right operand None.", left, right)
+            raise Exception
         if ((type(expr_left) == type(expr_right)) or (isinstance(expr_left, numerical) and isinstance(expr_right, numerical))):
-            #print "Here", val_left, type_left, val_right, type_right
+
             return (test_operators[operator](expr_left, expr_right), bool)
         else:
             try:
