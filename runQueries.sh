@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-if [ "$#" -lt 6 ]; then
+if [ "$#" -lt 5 ]; then
     echo "Usage: $0 [query_folder] [config_file] [result_file_name] [errors_file_name] [planonlyTrueorFalse]"
     exit 1
 fi
 
-echo -e  "qname,decompositionTime,planningTime,firstResult,overallExecTime,status,cardinality" >> $3
+echo -e  "qname\tdecompositionTime\tplanningTime\tfirstResult\toverallExecTime\tstatus\tcardinality" >> $3
 #for n in {1..5}; do
 for query in `ls -v $1/*`; do
 

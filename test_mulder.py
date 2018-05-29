@@ -162,15 +162,15 @@ def usage():
 
 if __name__ == '__main__':
 
-    query, config, isstring, planonly = get_options(sys.argv[1:])
+    # query, config, isstring, planonly = get_options(sys.argv[1:])
     # if isstring == 1:
     #     queryss = query.decode()
     # else:
     #     queryss = open(query).read()
     #
-    # queryss = open('queries/doi').read()
-    # config = 'config/pubs.json'
-
+    query = open('templates/testq1').read()
+    config = 'config/metis9config.json'
+    planonly = True
     config = ConfigFile(config)
     tempType = "MULDER"
     joinstarslocally = False
@@ -191,7 +191,7 @@ if __name__ == '__main__':
     qname = "Q"
     time1 = time()
     dc = MediatorDecomposer(query, config, tempType, joinstarslocally)
-    print ('Query:', query)
+    print('Query:', query)
 
     quers = dc.decompose()
     dt = time() - time1

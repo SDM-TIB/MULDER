@@ -188,9 +188,10 @@ def nexttime(time1):
 def printInfo():
     global tn
     global resulttime
+    global cn
     if tn == -1:
         tn = time() - time1
-    lr = (qname + "," + str(dt) + "," + str(pt) + "," + str(t1) + "," + str(tn) + "," + str(c1) + "," + str(cn))
+    lr = (qname + "\t" + str(dt) + "\t" + str(pt) + "\t" + str(t1) + "\t" + str(tn) + "\t" + str(c1) + "\t" + str(cn))
 
     print(lr)
     resulttime.write('\n' + lr)
@@ -200,6 +201,7 @@ def printInfo():
 def printtraces():
     global tn
     global resulttrace
+    global cn
 
     if tn == -1:
         tn = time() - time1
@@ -210,7 +212,6 @@ def printtraces():
 
 
 def onSignal1(s, stackframe):
-    printInfo()
     cs = active_children()
     for c in cs:
         try:
