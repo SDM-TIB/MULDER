@@ -23,7 +23,7 @@ configfile = '/MULDER/defaultconfig.json'
 
 @app.route("/sparql", methods=['POST', 'GET'])
 def sparql():
-    if request.method == 'GET':
+    if request.method == 'GET' or request.method == 'POST':
         try:
             query = request.args.get("query", '')
             # query = query.replace('\n', ' ').replace('\r', ' ')
@@ -35,7 +35,8 @@ def sparql():
             #     configuration = session.get('configuration')
             if configuration is None:
                 configuration = ConfigFile(configfile)
-
+            if query is None:
+                return jsonify({"result": [], "error": "cannot read query"})
             start = time()
             dc = MediatorDecomposer(query, configuration, tempType)
             quers = dc.decompose()

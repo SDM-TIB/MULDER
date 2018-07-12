@@ -87,3 +87,8 @@ you can start running MULDER using the following script:
  OR
 
  `$ python3.5 start_experiment.py -c <path/to/config.json> -q <query-file> -r <path/to/results-folder> -t 'MULDER' -s True -p <planonly> `
+ 
+ References
+ =========
+ 
+ `Endris, Kemele M., Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. "MULDER: Querying the Linked Data Web by Bridging RDF Molecule Templates." In International Conference on Database and Expert Systems Applications, pp. 3-18. Springer, Cham, 2017.`

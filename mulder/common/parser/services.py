@@ -3,7 +3,6 @@ from __future__ import division
 import string
 import os
 
-
 xsd = "http://www.w3.org/2001/XMLSchema#"
 
 class Service(object):
@@ -943,12 +942,12 @@ class Triple(object):
                 #or ((self.isGeneral) and (not self.subject.constant)
                  or ((not self.subject.constant)
                     and (not self.theobject.constant))
-                 or
-                   # added 09/03/2018
-                   (self.theobject.constant and
-                   self.predicate.constant and
-                   ('rdf:type' in self.predicate.name or 'a' == self.predicate.name or
-                     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' in self.predicate.name))
+                 # or
+                 #   # added 09/03/2018
+                 #   (self.theobject.constant and
+                 #   self.predicate.constant and
+                 #   ('rdf:type' in self.predicate.name or 'a' == self.predicate.name or
+                 #     'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' in self.predicate.name))
                 )
     def show(self, x):
         return x+self.subject.name+" " + self.predicate.name + " " + str(self.theobject)
