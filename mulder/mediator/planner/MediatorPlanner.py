@@ -282,13 +282,14 @@ class MediatorPlanner(object):
                 #         n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                 #         dependent_join = True
         elif not lowSelectivityLeft and lowSelectivityRight \
-                and not l.operator.__class__.__name__ == "NestedHashJoinFilter" \
-                and not (r.operator.__class__.__name__ == "NestedHashJoinFilter" or r.operator.__class__.__name__ == "Xgjoin"):
+                and (isinstance(l, TreePlan) and not l.operator.__class__.__name__ == "NestedHashJoinFilter") \
+                and (isinstance(r, TreePlan) and not (r.operator.__class__.__name__ == "NestedHashJoinFilter"
+                                                      or r.operator.__class__.__name__ == "Xgjoin")):
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, l, r)
                 dependent_join = True
-        elif lowSelectivityLeft and not lowSelectivityRight and not r.operator.__class__.__name__ == "NestedHashJoinFilter" and not (
-                l.operator.__class__.__name__ == "NestedHashJoinFilter" or l.operator.__class__.__name__ == "Xgjoin"):
+        elif lowSelectivityLeft and not lowSelectivityRight and (isinstance(r, TreePlan) and not r.operator.__class__.__name__ == "NestedHashJoinFilter") \
+                and (isinstance(l, TreePlan) and not (l.operator.__class__.__name__ == "NestedHashJoinFilter" or l.operator.__class__.__name__ == "Xgjoin")):
             if len(join_variables) > 0:
                 n = TreePlan(NestedHashJoin(join_variables), all_variables, r, l)
                 dependent_join = True

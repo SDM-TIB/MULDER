@@ -269,7 +269,7 @@ class MediatorDecomposer(object):
         leftvars = leftsubj + leftobj
         rightvars = rightsubj + rightobj
         inter = set(leftvars).intersection(set(rightvars))
-        print (inter)
+        # print (inter)
         if len(inter) > 0:
             return True
 
