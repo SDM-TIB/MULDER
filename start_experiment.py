@@ -33,7 +33,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults, planonly):
+def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults, planonly, joinlocally=True):
 
     '''if isEndpoint:
         contact = contactSource
@@ -69,7 +69,7 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
 
     time1 = time()
 
-    mdq = MediatorDecomposer(query, config, tempType)
+    mdq = MediatorDecomposer(query, config, tempType, joinlocally)
     new_query = mdq.decompose()
 
     dt = time() - time1
@@ -230,7 +230,7 @@ def onSignal2(s, stackframe):
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:c:q:t:s:r:p:")
+        opts, args = getopt.getopt(argv, "h:c:q:t:s:r:j:p:")
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -245,6 +245,7 @@ def get_options(argv):
     withoutCounts = False
     printResults = False
     planonly = False
+    joinlocally = True
     for opt, arg in opts:
         if opt == "-h":
             usage()
@@ -261,12 +262,14 @@ def get_options(argv):
             printResults = eval(arg)
         elif opt == '-p':
             planonly = eval(arg)
+        elif opt == '-j':
+            joinlocally = eval(arg)
 
     if not configfile or not queryfile:
         usage()
         sys.exit(1)
 
-    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults, planonly)
+    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults, planonly, joinlocally)
 
 
 def usage():
@@ -281,11 +284,11 @@ def usage():
 def main(argv):
     res = Queue()
     time1 = time()
-    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults, planonly) = get_options(argv[1:])
+    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults, planonly, joinlocally) = get_options(argv[1:])
     try:
-        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, planonly)
+        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, planonly, joinlocally)
     except Exception as ex:
-        print (ex)
+        print(ex)
 
 
 if __name__ == '__main__':
