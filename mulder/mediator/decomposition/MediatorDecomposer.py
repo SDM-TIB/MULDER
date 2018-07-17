@@ -236,16 +236,34 @@ class MediatorDecomposer(object):
                             qpl1.append(m)
         if qpl0 and not self.joinlocally:
             joins = {}
-            k = 0
+            g = 0
+            merged = []
+            for i in range(len(qpl0)):
+                if i+1 < len(qpl0):
+                    for j in range(i+1, len(qpl0)):
+                        s = qpl0[i]
+                        k = qpl0[j]
+                        if s.endpoint == k.endpoint:
+                            if self.shareAtLeastOneVar(k.triples, s.triples):
+                                if s.endpoint in joins:
+                                    joins[s.endpoint].extend(s.triples + k.triples)
+                                else:
+                                    joins[s.endpoint] = s.triples + k.triples
+                                merged.append(s)
+                                merged.append(k)
+
+            [qpl0.remove(r) for r in set(merged)]
             for s in qpl0:
                 if s.endpoint in joins:
-                    if self.shareAtLeastOneVar( joins[s.endpoint], s.triples):
+                    if self.shareAtLeastOneVar(joins[s.endpoint], s.triples):
                         joins[s.endpoint].extend(s.triples)
                     else:
-                        joins[s.endpoint+"|" + str(k)] = s.triples
-                        k += 1
+
+                        joins[s.endpoint+"|" + str(g)] = s.triples
+                        g += 1
                 else:
                     joins[s.endpoint] = s.triples
+
             qpl0 = []
             for e in joins:
                 endp = e.split('|')[0]
