@@ -137,6 +137,35 @@ class NestedHashJoinFilter(Join):
 
     def makeInstantiation(self, filter_bag, operators):
         filter_str = ''
+        new_vars = ['?' + v for v in self.vars]  # TODO: this might be $
+        filter_str = " . ".join(map(str, operators.tree.service.filters))
+        # print "making instantiation join filter", filter_bag
+        # When join variables are more than one: FILTER ( )
+        if len(self.vars) >= 1:
+            filter_str += ' . FILTER (__expr__)'
+
+            or_expr = []
+            for tuple in filter_bag:
+                and_expr = []
+                for var in self.vars:
+                    # aux = "?" + var + "==" + tuple[var]
+                    v = tuple[var]
+                    if v.find("http") == 0:  # uris must be passed between < .. >
+                        v = "<" + v + ">"
+                    else:
+                        v = '"' + v + '"'
+                    v = "?" + var + "=" + v
+                    and_expr.append(v)
+
+                or_expr.append('(' + ' && '.join(and_expr) + ')')
+            filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))
+        new_operator = operators.instantiateFilter(set(new_vars), filter_str)
+        # print "type(new_operator)", type(new_operator)
+
+        return new_operator
+
+    def makeInstantiationX(self, filter_bag, operators):
+        filter_str = ''
 
         import copy
         operator = copy.copy(operators)

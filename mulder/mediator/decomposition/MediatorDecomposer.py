@@ -251,6 +251,7 @@ class MediatorDecomposer(object):
                                     joins[s.endpoint] = s.triples + k.triples
                                 merged.append(s)
                                 merged.append(k)
+                            joins[s.endpoint] = list(set(joins[s.endpoint]))
 
             [qpl0.remove(r) for r in set(merged)]
             for s in qpl0:
@@ -263,6 +264,8 @@ class MediatorDecomposer(object):
                         g += 1
                 else:
                     joins[s.endpoint] = s.triples
+
+                joins[s.endpoint] = list(set(joins[s.endpoint]))
 
             qpl0 = []
             for e in joins:
