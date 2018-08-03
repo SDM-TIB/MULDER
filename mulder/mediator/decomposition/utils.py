@@ -1,6 +1,4 @@
 
-
-
 def getVars(sg):
 
     s = []
