@@ -1,0 +1,12 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX iasis: <http://project-iasis.eu/vocab/>
+PREFIX drugbank: <http://bio2rdf.org/drugbank_vocabulary:>
+PREFIX iasis: <http://project-iasis.eu/vocab/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT DISTINCT *
+WHERE {
+
+          ?protein     rdfs:label ?proteinName .
+
+        }limit 100

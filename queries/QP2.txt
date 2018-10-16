@@ -1,0 +1,12 @@
+SELECT DISTINCT * WHERE {
+    ?s <http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/representedOrganization> ?org .
+    ?s <http://www.w3.org/2002/07/owl#sameAs> ?sd.
+    ?s <http://www.w3.org/2000/01/rdf-schema#label> ?slabel.
+    ?org <http://www.w3.org/2002/07/owl#sameAs> ?lctAgency.
+    ?org <http://www.w3.org/2000/01/rdf-schema#label> ?orgName .
+    ?sd <http://www.w3.org/2002/07/owl#sameAs> ?s2 .
+    ?sd <http://www.w3.org/2000/01/rdf-schema#label> ?sddrugname .
+    ?sd <http://xmlns.com/foaf/0.1/page> ?sdpage .
+    ?md <http://www.w3.org/2002/07/owl#sameAs> ?s .
+    ?md <http://xmlns.com/foaf/0.1/name> ?drugname.
+    }

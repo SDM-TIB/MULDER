@@ -1,0 +1,20 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX iasis: <http://project-iasis.eu/vocab/>
+PREFIX drugbank: <http://bio2rdf.org/drugbank_vocabulary:>
+PREFIX iasis: <http://project-iasis.eu/vocab/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?mutation ?proteinName
+WHERE {
+          ?mutation    rdf:type iasis:Mutation .
+          ?mutation    iasis:mutation_somatic_status 'Confirmed somatic variant'.
+          ?mutation    iasis:fathmm_score ?fscore .
+          ?mutation    iasis:mutation_isLocatedIn_transcript ?transcript .
+          ?transcript  iasis:translates_as ?protein .
+          ?drug        iasis:drug_interactsWith_protein ?protein .
+          ?protein     iasis:label ?proteinName .
+          ?drug        iasis:label 'docetaxel' .
+          ?drug        <http://project-iasis.eu/vocab/externalLink> ?drug1 .
+          ?drug1       drugbank:transporter ?transporter .
+          ?transporter drugbank:gene-name ?proteinName .
+        }limit 100
