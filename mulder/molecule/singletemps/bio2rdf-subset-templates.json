@@ -1,0 +1,1384 @@
+[
+  {
+    "rootType": "http://bio2rdf.org/pubmed_vocabulary:Resource",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:x-identifiers.org",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/clinicaltrials_vocabulary:citation",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/created",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pubmed_vocabulary:Resource"
+        ],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:article",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:expansion-method",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:interactor_a",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:interactor_b",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:maximum-number-interactions-reported",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:minimum-number-interactions-reported",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:number-supporting-articles",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:source",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:taxon-sequence-identical-interaction",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:host-organism",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:interactor_a_biological_role",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:interactor_a_experimental_role",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:interactor_b_biological_role",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:interactor_b_experimental_role",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/irefindex_vocabulary:method",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [
+      "http://bio2rdf.org/pubmed_vocabulary:Resource"
+    ],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+          "http://purl.org/dc/terms/title",
+          "http://purl.org/dc/terms/identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/bio2rdf_vocabulary:x-identifiers.org",
+          "http://bio2rdf.org/clinicaltrials_vocabulary:citation",
+          "http://purl.org/dc/terms/created",
+          "http://bio2rdf.org/irefindex_vocabulary:article",
+          "http://bio2rdf.org/irefindex_vocabulary:expansion-method",
+          "http://bio2rdf.org/irefindex_vocabulary:interactor_a",
+          "http://bio2rdf.org/irefindex_vocabulary:interactor_b",
+          "http://bio2rdf.org/irefindex_vocabulary:maximum-number-interactions-reported",
+          "http://bio2rdf.org/irefindex_vocabulary:minimum-number-interactions-reported",
+          "http://bio2rdf.org/irefindex_vocabulary:number-supporting-articles",
+          "http://bio2rdf.org/irefindex_vocabulary:source",
+          "http://bio2rdf.org/irefindex_vocabulary:taxon-sequence-identical-interaction",
+          "http://bio2rdf.org/irefindex_vocabulary:host-organism",
+          "http://bio2rdf.org/irefindex_vocabulary:interactor_a_biological_role",
+          "http://bio2rdf.org/irefindex_vocabulary:interactor_a_experimental_role",
+          "http://bio2rdf.org/irefindex_vocabulary:interactor_b_biological_role",
+          "http://bio2rdf.org/irefindex_vocabulary:interactor_b_experimental_role",
+          "http://bio2rdf.org/irefindex_vocabulary:method"
+        ],
+        "cardinality": 1116020,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  },
+  {
+    "rootType": "http://bio2rdf.org/sider_vocabulary:Side-Effect",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/sider_vocabulary:side-effect",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/sider_vocabulary:stitch-flat",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/sider_vocabulary:stitch-stereo",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://purl.org/dc/terms/title",
+          "http://purl.org/dc/terms/identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/sider_vocabulary:side-effect",
+          "http://bio2rdf.org/sider_vocabulary:stitch-flat",
+          "http://bio2rdf.org/sider_vocabulary:stitch-stereo"
+        ],
+        "cardinality": 140064,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  },
+  {
+    "rootType": "http://bio2rdf.org/pharmgkb_vocabulary:Disease",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2002/07/owl#sameAs",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:name",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:synonym",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-meddra",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-mesh",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-ndfrt",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-snomedct",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-umls",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Gene"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:haplotype",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Variation"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:variantlocation",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Disease"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:disease",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [
+      "http://bio2rdf.org/pharmgkb_vocabulary:Variation",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Gene",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Disease"
+    ],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://www.w3.org/2002/07/owl#sameAs",
+          "http://purl.org/dc/terms/title",
+          "http://purl.org/dc/terms/identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/pharmgkb_vocabulary:name",
+          "http://bio2rdf.org/pharmgkb_vocabulary:synonym",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-meddra",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-mesh",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-ndfrt",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-snomedct",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-umls",
+          "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+          "http://bio2rdf.org/pharmgkb_vocabulary:haplotype",
+          "http://bio2rdf.org/pharmgkb_vocabulary:variantlocation",
+          "http://bio2rdf.org/pharmgkb_vocabulary:disease"
+        ],
+        "cardinality": 3478,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  },
+  {
+    "rootType": "http://bio2rdf.org/pharmgkb_vocabulary:Variation",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Gene"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:x-identifiers.org",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [
+      "http://bio2rdf.org/pharmgkb_vocabulary:Gene"
+    ],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+          "http://purl.org/dc/terms/title",
+          "http://bio2rdf.org/bio2rdf_vocabulary:x-identifiers.org",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://purl.org/dc/terms/identifier"
+        ],
+        "cardinality": 24784848,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  },
+  {
+    "rootType": "http://bio2rdf.org/drugbank_vocabulary:Drug",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2002/07/owl#sameAs",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/description",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:x-identifiers.org",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-bindingdb",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-chemspider",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-pdb",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-pubchemcompound",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-pubchemsubstance",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:absorption",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:affected-organism",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:brand",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:calculated-properties",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:category",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:clearance",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:ddi-interactor-in",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:dosage",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:drug-classification-category",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:drugbank-id",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:enzyme",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:experimental-properties",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:food-interaction",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:group",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:half-life",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:indication",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:manufacturer",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:mechanism-of-action",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:mixture",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:packager",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:patent",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:pharmacodynamics",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:product",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:protein-binding",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:route-of-elimination",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:synonym",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:target",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:toxicity",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:transporter",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:volume-of-distribution",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-ahfs",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-atc",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-cas",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-chebi",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-genbank",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-gtp",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-iuphar",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-kegg",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-ndc",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Drug"
+        ],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-pharmgkb",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-uniprot",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:x-wikipedia",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:carrier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/drugbank_vocabulary:salt",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [
+      "http://bio2rdf.org/pharmgkb_vocabulary:Drug"
+    ],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+          "http://www.w3.org/2002/07/owl#sameAs",
+          "http://purl.org/dc/terms/title",
+          "http://purl.org/dc/terms/description",
+          "http://purl.org/dc/terms/identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/bio2rdf_vocabulary:x-identifiers.org",
+          "http://bio2rdf.org/drugbank_vocabulary:x-bindingdb",
+          "http://bio2rdf.org/drugbank_vocabulary:x-chemspider",
+          "http://bio2rdf.org/drugbank_vocabulary:x-pdb",
+          "http://bio2rdf.org/drugbank_vocabulary:x-pubchemcompound",
+          "http://bio2rdf.org/drugbank_vocabulary:x-pubchemsubstance",
+          "http://bio2rdf.org/drugbank_vocabulary:absorption",
+          "http://bio2rdf.org/drugbank_vocabulary:affected-organism",
+          "http://bio2rdf.org/drugbank_vocabulary:brand",
+          "http://bio2rdf.org/drugbank_vocabulary:calculated-properties",
+          "http://bio2rdf.org/drugbank_vocabulary:category",
+          "http://bio2rdf.org/drugbank_vocabulary:clearance",
+          "http://bio2rdf.org/drugbank_vocabulary:ddi-interactor-in",
+          "http://bio2rdf.org/drugbank_vocabulary:dosage",
+          "http://bio2rdf.org/drugbank_vocabulary:drug-classification-category",
+          "http://bio2rdf.org/drugbank_vocabulary:drugbank-id",
+          "http://bio2rdf.org/drugbank_vocabulary:enzyme",
+          "http://bio2rdf.org/drugbank_vocabulary:experimental-properties",
+          "http://bio2rdf.org/drugbank_vocabulary:food-interaction",
+          "http://bio2rdf.org/drugbank_vocabulary:group",
+          "http://bio2rdf.org/drugbank_vocabulary:half-life",
+          "http://bio2rdf.org/drugbank_vocabulary:indication",
+          "http://bio2rdf.org/drugbank_vocabulary:manufacturer",
+          "http://bio2rdf.org/drugbank_vocabulary:mechanism-of-action",
+          "http://bio2rdf.org/drugbank_vocabulary:mixture",
+          "http://bio2rdf.org/drugbank_vocabulary:packager",
+          "http://bio2rdf.org/drugbank_vocabulary:patent",
+          "http://bio2rdf.org/drugbank_vocabulary:pharmacodynamics",
+          "http://bio2rdf.org/drugbank_vocabulary:product",
+          "http://bio2rdf.org/drugbank_vocabulary:protein-binding",
+          "http://bio2rdf.org/drugbank_vocabulary:route-of-elimination",
+          "http://bio2rdf.org/drugbank_vocabulary:synonym",
+          "http://bio2rdf.org/drugbank_vocabulary:target",
+          "http://bio2rdf.org/drugbank_vocabulary:toxicity",
+          "http://bio2rdf.org/drugbank_vocabulary:transporter",
+          "http://bio2rdf.org/drugbank_vocabulary:volume-of-distribution",
+          "http://bio2rdf.org/drugbank_vocabulary:x-ahfs",
+          "http://bio2rdf.org/drugbank_vocabulary:x-atc",
+          "http://bio2rdf.org/drugbank_vocabulary:x-cas",
+          "http://bio2rdf.org/drugbank_vocabulary:x-chebi",
+          "http://bio2rdf.org/drugbank_vocabulary:x-genbank",
+          "http://bio2rdf.org/drugbank_vocabulary:x-gtp",
+          "http://bio2rdf.org/drugbank_vocabulary:x-iuphar",
+          "http://bio2rdf.org/drugbank_vocabulary:x-kegg",
+          "http://bio2rdf.org/drugbank_vocabulary:x-ndc",
+          "http://bio2rdf.org/drugbank_vocabulary:x-pharmgkb",
+          "http://bio2rdf.org/drugbank_vocabulary:x-uniprot",
+          "http://bio2rdf.org/drugbank_vocabulary:x-wikipedia",
+          "http://bio2rdf.org/drugbank_vocabulary:carrier",
+          "http://bio2rdf.org/drugbank_vocabulary:salt"
+        ],
+        "cardinality": 7759,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  },
+  {
+    "rootType": "http://bio2rdf.org/pharmgkb_vocabulary:Drug",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:brand_mixture",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:drug_class",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:generic_name",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:trade_name",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-atc",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-bindingdb",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-chebi",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-chemspider",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-clinicaltrials",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-dailymed",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-dpd",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/drugbank_vocabulary:Drug"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-drugbank",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-genbank",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-het",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-iupharligand",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-kegg",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-ndc",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-pdb",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-pubchemcompound",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-pubchemsubstance",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-ttd",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-uniprot",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-webresource",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Gene"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:haplotype",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Variation"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:variantlocation",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Drug"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:drug",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [
+      "http://bio2rdf.org/drugbank_vocabulary:Drug",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Gene",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Drug",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Variation"
+    ],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://purl.org/dc/terms/title",
+          "http://purl.org/dc/terms/identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/pharmgkb_vocabulary:brand_mixture",
+          "http://bio2rdf.org/pharmgkb_vocabulary:drug_class",
+          "http://bio2rdf.org/pharmgkb_vocabulary:generic_name",
+          "http://bio2rdf.org/pharmgkb_vocabulary:trade_name",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-atc",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-bindingdb",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-chebi",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-chemspider",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-clinicaltrials",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-dailymed",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-dpd",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-drugbank",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-genbank",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-het",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-iupharligand",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-kegg",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-ndc",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-pdb",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-pubchemcompound",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-pubchemsubstance",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-ttd",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-uniprot",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-webresource",
+          "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+          "http://bio2rdf.org/pharmgkb_vocabulary:haplotype",
+          "http://bio2rdf.org/pharmgkb_vocabulary:variantlocation",
+          "http://bio2rdf.org/pharmgkb_vocabulary:drug"
+        ],
+        "cardinality": 3168,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  },
+  {
+    "rootType": "http://bio2rdf.org/pharmgkb_vocabulary:Gene",
+    "predicates": [
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/title",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://purl.org/dc/terms/identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://rdfs.org/ns/void#inDataset",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:name",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-uniprot",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:alternate-symbol",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:alternative-name",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:chromosome",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:chromosome-end",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:chromosome-start",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:cpic-dosing-guideline",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:has-variant-annotation",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:is-vip",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:symbol",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-alfred",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-ctd",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-ensembl",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-genatlas",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-genecards",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-go",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-hgnc",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-huge",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-humancyc",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-iupharreceptor",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-modbase",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-mutdb",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-ncbigene",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-omim",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-refseq",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Disease"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:disease",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Drug"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:drug",
+        "operator": "PR"
+      },
+      {
+        "range": [
+          "http://bio2rdf.org/pharmgkb_vocabulary:Gene"
+        ],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+        "operator": "PR"
+      },
+      {
+        "range": [],
+        "predicate": "http://bio2rdf.org/pharmgkb_vocabulary:x-webresource",
+        "operator": "PR"
+      }
+    ],
+    "linkedTo": [
+      "http://bio2rdf.org/pharmgkb_vocabulary:Disease",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Gene",
+      "http://bio2rdf.org/pharmgkb_vocabulary:Drug"
+    ],
+    "subClassOf": [],
+    "wrappers": [
+      {
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://www.w3.org/2000/01/rdf-schema#seeAlso",
+          "http://purl.org/dc/terms/title",
+          "http://purl.org/dc/terms/identifier",
+          "http://rdfs.org/ns/void#inDataset",
+          "http://bio2rdf.org/bio2rdf_vocabulary:identifier",
+          "http://bio2rdf.org/bio2rdf_vocabulary:namespace",
+          "http://bio2rdf.org/bio2rdf_vocabulary:uri",
+          "http://bio2rdf.org/pharmgkb_vocabulary:name",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-uniprot",
+          "http://bio2rdf.org/pharmgkb_vocabulary:alternate-symbol",
+          "http://bio2rdf.org/pharmgkb_vocabulary:alternative-name",
+          "http://bio2rdf.org/pharmgkb_vocabulary:chromosome",
+          "http://bio2rdf.org/pharmgkb_vocabulary:chromosome-end",
+          "http://bio2rdf.org/pharmgkb_vocabulary:chromosome-start",
+          "http://bio2rdf.org/pharmgkb_vocabulary:cpic-dosing-guideline",
+          "http://bio2rdf.org/pharmgkb_vocabulary:has-variant-annotation",
+          "http://bio2rdf.org/pharmgkb_vocabulary:is-vip",
+          "http://bio2rdf.org/pharmgkb_vocabulary:symbol",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-alfred",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-ctd",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-ensembl",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-genatlas",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-genecards",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-go",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-hgnc",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-huge",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-humancyc",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-iupharreceptor",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-modbase",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-mutdb",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-ncbigene",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-omim",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-refseq",
+          "http://bio2rdf.org/pharmgkb_vocabulary:disease",
+          "http://bio2rdf.org/pharmgkb_vocabulary:drug",
+          "http://bio2rdf.org/pharmgkb_vocabulary:gene",
+          "http://bio2rdf.org/pharmgkb_vocabulary:x-webresource"
+        ],
+        "cardinality": 27023,
+        "wrapperType": "SPARQLEndpoint",
+        "url": "http://bio2rdf.org/sparql",
+        "urlparam": ""
+      }
+    ]
+  }
+]
