@@ -6,19 +6,38 @@ import http.client as htclient
 from http import HTTPStatus
 import requests
 import json
+import pprint as pp
 import pprint
 import os
 import random
 import sys, getopt, os
 from multiprocessing import Queue, Process
 from multiprocessing.queues import Empty
+import logging
+
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logger = logging.getLogger()
+#if not logger.handlers:
+logger.setLevel(logging.INFO)
+fileHandler = logging.FileHandler("{0}/{1}.log".format('.', 'rdfmts-log'))
+fileHandler.setLevel(logging.INFO)
+fileHandler.setFormatter(logFormatter)
+
+logger.addHandler(fileHandler)
+
+consoleHandler = logging.StreamHandler()
+consoleHandler.setLevel(logging.INFO)
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
+
+
 
 metas = [    'http://www.w3.org/ns/sparql-service-description',
              'http://www.openlinksw.com/schemas/virtrdf#',
              'http://www.w3.org/2000/01/rdf-schema#',
              'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+             'http://purl.org/dc/terms/Dataset',
              'http://www.w3.org/2002/07/owl#',
-              'http://purl.org/dc/terms/Dataset',
              'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/ProductType',
              'nodeID://']
 
@@ -37,8 +56,10 @@ def get_rdfs_ranges(referer, server, path, p, limit=-1):
             res, card = contactSource(query_copy, referer, server, path)
             numrequ += 1
             if card == -2:
-                limit = limit / 2
-                if limit == 0:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
                     break
                 continue
             if card > 1:
@@ -76,8 +97,10 @@ def find_instance_range(referer, server, path, t, p, limit=-1):
             res, card = contactSource(query_copy, referer, server, path)
             numrequ += 1
             if card == -2:
-                limit = limit / 2
-                if limit == 0:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
                     break
                 continue
             if card > 0:
@@ -102,7 +125,7 @@ def find_instance_range(referer, server, path, t, p, limit=-1):
     return ranges
 
 
-def get_concepts(endpoint, limit=-1, outqueue=Queue()):
+def get_concepts(endpoint, limit=-1, outqueue=Queue(), types=[]):
     """
     Entry point for extracting RDF-MTs of an endpoint.
     Extracts list of rdf:Class concepts and predicates of an endpoint
@@ -110,7 +133,6 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
     :param limit:
     :return:
     """
-    query = "SELECT DISTINCT ?t WHERE{ ?s a ?t } "
     referer = endpoint
     if 'https' in endpoint:
         server = endpoint.split("https://")[1]
@@ -119,42 +141,50 @@ def get_concepts(endpoint, limit=-1, outqueue=Queue()):
 
     (server, path) = server.split("/", 1)
     reslist = []
-    if limit == -1:
-        limit = 50
-        offset = 0
-        numrequ = 0
-        while True:
-            query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
-            res, card = contactSource(query_copy, referer, server, path)
-            # print "cardinality:", card
-            numrequ += 1
-            # print 'number of requests: ', numrequ
-            if card == -2:
-                limit = limit / 2
-                # print ('limit:', limit)
-                if limit == 0:
+
+    if len(types) == 0:
+        query = "SELECT DISTINCT ?t WHERE{ ?s a ?t } "
+
+        if limit == -1:
+            limit = 50
+            offset = 0
+            numrequ = 0
+            while True:
+                query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+                res, card = contactSource(query_copy, referer, server, path)
+                # print "cardinality:", card
+                numrequ += 1
+                # print 'number of requests: ', numrequ
+                if card == -2:
+                    limit = limit // 2
+                    limit = int(limit)
+                    # print "setting limit to: ", limit
+                    if limit < 1:
+                        break
+                    continue
+                if card > 0:
+                    reslist.extend(res)
+                if card < limit:
                     break
-                continue
-            if card > 0:
-                reslist.extend(res)
-            if card < limit:
-                break
-            offset += limit
+                offset += limit
+        else:
+            reslist, card = contactSource(query, referer, server, path)
+
+
+        toremove = []
+        # [toremove.append(r) for v in metas for r in reslist if v in r['t']]
+        for r in reslist:
+            for m in metas:
+                if m in str(r['t']):
+                    toremove.append(r)
+
+        for r in toremove:
+            reslist.remove(r)
+
     else:
-        reslist, card = contactSource(query, referer, server, path)
-
+        reslist = [{'t': t} for t in types]
+    logger.info(reslist)
     results = []
-
-    toremove = []
-    # [toremove.append(r) for v in metas for r in reslist if v in r['t']]
-    for r in reslist:
-        for m in metas:
-            if m in str(r['t']):
-                toremove.append(r)
-
-    for r in toremove:
-        reslist.remove(r)
-
     for r in reslist:
 
         t = r['t']
@@ -198,9 +228,12 @@ def get_predicates(referer, server, path, t, limit=-1):
             numrequ += 1
             # print "predicates card:", card
             if card == -2:
-                limit = limit / 2
+                limit = limit // 2
+                limit = int(limit)
                 # print "setting limit to: ", limit
-                if limit == 0:
+                if limit < 1:
+                    print("giving up on " + query)
+                    print("trying instances .....")
                     rand_inst_res = get_preds_of_random_instances(referer, server, path, t)
                     existingpreds = [r['p'] for r in reslist]
                     for r in rand_inst_res:
@@ -243,9 +276,10 @@ def get_preds_of_random_instances(referer, server, path, t, limit=-1):
             numrequ += 1
             # print "rand predicates card:", card
             if card == -2:
-                limit = limit / 2
-                # print "rand setting limit to: ", limit
-                if limit == 0:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
                     break
                 continue
             if numrequ == 100:
@@ -280,9 +314,10 @@ def get_preds_of_instance(referer, server, path, inst, limit=-1):
             numrequ += 1
             # print "inst predicates card:", card
             if card == -2:
-                limit = limit / 2
-                # print "inst setting limit to: ", limit
-                if limit == 0:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
                     break
                 continue
             if card > 0:
@@ -316,9 +351,10 @@ def getResults(query, endpoint, limit=-1):
             numrequ += 1
             # print 'number of requests: ', numrequ
             if card == -2:
-                limit = limit / 2
-                # print 'limit:', limit
-                if limit == 0:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
                     break
                 continue
             if card > 1:
@@ -354,7 +390,7 @@ def contactSource(query, referer, server, path):
         server = server.replace('0.0.0.0', 'localhost')
     # Build the query and header.
     # params = urllib.urlencode({'query': query})
-    params = urlparse.urlencode({'query': query, 'format': json})
+    params = urlparse.urlencode({'query': query, 'format': json, 'timeout':10000000})
     headers = {"Accept": "*/*", "Referer": referer, "Host": server}
 
     # js = "application/sparql-results+json"
@@ -445,8 +481,10 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
         res, card = contactSource(query_copy, referer, server, path)
         numrequ += 1
         if card == -2:
-            limit = limit / 2
-            if limit == 0:
+            limit = limit // 2
+            limit = int(limit)
+            # print "setting limit to: ", limit
+            if limit < 1:
                 break
 
             continue
@@ -507,6 +545,7 @@ def read_rdfmts(folder):
     molecules = {}
     # print 'Number of molecules in:'
     for m in files:
+        print(m)
         with open(folder + '/' + m) as f:
             rdfmt = json.load(f)
             key = rdfmt[0]['wrappers'][0]['url']
@@ -535,10 +574,26 @@ def combine_single_source_descriptions(rdfmts):
 
             molecule_dict[m['rootType']] = m
 
+    logger.info(str(list(molecule_dict.keys())))
         # molecules.extend(rdfmts[rdfmt])
         # print '-->', rdfmt, '=', len(rdfmts[rdfmt])
     for m in molecule_dict:
-        molecules.append(molecule_dict[m])
+        mol = molecule_dict[m]
+        linkstoremove = []
+        for l in mol['linkedTo']:
+            if l not in molecule_dict:
+                linkstoremove.append(l)
+        for l in linkstoremove:
+            mol['linkedTo'].remove(l)
+        for p in mol['predicates']:
+            rangestoremove = []
+            for r in p['range']:
+                    if r not in molecule_dict:
+                        rangestoremove.append(r)
+            for r in rangestoremove:
+                p['range'].remove(r)
+
+        molecules.append(mol)
 
     for root in molecules_tomerge:
         mols = molecules_tomerge[root]
@@ -548,15 +603,28 @@ def combine_single_source_descriptions(rdfmts):
                'predicates': []}
         for m in mols:
             res['wrappers'].append(m['wrappers'][0])
-            res['linkedTo'].extend(m['linkedTo'])
+            for l in m['linkedTo']:
+                if l in molecule_dict:
+                    res['linkedTo'].append(l)
+
             res['linkedTo'] = list(set(res['linkedTo']))
             predicates = {}
             for p in m['predicates']:
                 if p['predicate'] in predicates:
-                    predicates[p['predicate']]['range'].extend(p['range'])
+                    for r in p['range']:
+                        if r in list(molecule_dict.keys()):
+                            predicates[p['predicate']]['range'].append(r)
+                        elif r in predicates[p['predicate']]['range']:
+                            predicates[p['predicate']]['range'].remove(r)
+
                     predicates[p['predicate']]['range'] = list(set(predicates[p['predicate']]['range']))
                 else:
-                    predicates[p['predicate']] = p
+                    np = p.copy()
+                    for r in p['range']:
+                        if r not in list(molecule_dict.keys()):
+                            np['range'].remove(r)
+
+                    predicates[p['predicate']] = np
 
             for p in predicates:
                 res['predicates'].append(predicates[p])
@@ -568,9 +636,38 @@ def combine_single_source_descriptions(rdfmts):
     return molecules
 
 
-def extractMTLs(endpoint, outqueue=Queue()):
+def get_subclasses(endpoint, root):
+    referer = endpoint
+    if 'https' in endpoint:
+        server = endpoint.split("https://")[1]
+    else:
+        server = endpoint.split("http://")[1]
+
+    (server, path) = server.split("/", 1)
+    query = "SELECT DISTINCT ?subc WHERE{<" + root + "> <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?subc }"
+    res, card = contactSource(query, referer, server, path)
+    return res
+
+
+def get_cardinality(endpoint, root):
+    referer = endpoint
+    if 'https' in endpoint:
+        server = endpoint.split("https://")[1]
+    else:
+        server = endpoint.split("http://")[1]
+
+    (server, path) = server.split("/", 1)
+    query = "SELECT COUNT(DISTINCT ?s) as ?count WHERE{?s a <" + root + "> }"
+    res, card = contactSource(query, referer, server, path)
+    if len(res) > 0:
+        return res[0]['count']
+    return -1
+
+
+def extractMTLs(endpoint, outqueue=Queue(), types=[]):
     rdfmolecules = {}
-    res = get_concepts(endpoint)
+    res = get_concepts(endpoint, types=types)
+    print(res)
     molecules = {}
     for row in res:
         if row['t'] in molecules:
@@ -604,7 +701,7 @@ def extractMTLs(endpoint, outqueue=Queue()):
                     ranges.extend(row['r'])
                 ranges = list(set(ranges))
 
-                molecules[row['t']]['predicates'].append({'predicate': row['p'], 'range': ranges})
+                molecules[row['t']]['predicates'].append({'predicate': row['p'], 'range': ranges, 'operator': "PR"})
                 molecules[row['t']]['linkedTo'].extend(ranges)
                 molecules[row['t']]['linkedTo'] = list(set(molecules[row['t']]['linkedTo']))
 
@@ -612,17 +709,24 @@ def extractMTLs(endpoint, outqueue=Queue()):
             if row['p'] not in molecules[row['t']]['wrappers'][0]['predicates']:
                 molecules[row['t']]['wrappers'][0]['predicates'].append(row['p'])
         else:
+            card = get_cardinality(endpoint, row['t'])
+            if isinstance(card, str):
+                card = int(card[:card.find('^')])
+            subc = get_subclasses(endpoint, row['t'])
+            subclass = [r['subc'] for r in subc]
             molecules[row['t']] = {'rootType': row['t'],
                                    'linkedTo': [],
+                                   'subClassOf': subclass,
                                    'wrappers': [{'url': endpoint,
                                                  'urlparam': "",
+                                                 'cardinality': card,
                                                  'wrapperType': "SPARQLEndpoint",
-                                                 'predicates': [row['p']]}
+                                                 'predicates': [row['p']]
+                                                 }
                                                 ]
                                    }
             found = False
-            molecules[row['t']]['predicates'] = [{'predicate': row['p'],
-                                                  'range': []}]
+            molecules[row['t']]['predicates'] = [{'predicate': row['p'], 'range': [], 'operator':"PR"}]
             ranges = []
             if 'range' in row and len(row['range']) > 0:
                 ranges.extend(row['range'])
@@ -631,7 +735,7 @@ def extractMTLs(endpoint, outqueue=Queue()):
             ranges = list(set(ranges))
 
             molecules[row['t']]['predicates'] = [{'predicate': row['p'],
-                                                  'range': ranges}]
+                                                  'range': ranges, 'operator':"PR"}]
 
             molecules[row['t']]['linkedTo'].extend(ranges)
             molecules[row['t']]['linkedTo'] = list(set(molecules[row['t']]['linkedTo']))
@@ -640,7 +744,12 @@ def extractMTLs(endpoint, outqueue=Queue()):
     print('----------------------', endpoint, '-------------------------------------')
     print('=========================================================================')
 
+    logger.info('=========================================================================')
+    logger.info('----------------------' + endpoint + '-------------------------------------')
+    logger.info('=========================================================================')
+
     pp.pprint(molecules)
+    logger.info(str(molecules))
 
     rdfmols = []
     for m in molecules:
@@ -652,7 +761,7 @@ def extractMTLs(endpoint, outqueue=Queue()):
     return rdfmolecules
 
 
-def get_single_source_rdfmts(enpointmaps, outqueue=Queue()):
+def get_single_source_rdfmts(enpointmaps, outqueue=Queue(), types=[]):
     rdfmolecules = {}
     queues = {}
 
@@ -660,7 +769,7 @@ def get_single_source_rdfmts(enpointmaps, outqueue=Queue()):
         rdfmolecules[endpoint] = []
         queue = Queue()
         queues[endpoint] = queue
-        p = Process(target=extractMTLs, args=(endpoint, queue, ))
+        p = Process(target=extractMTLs, args=(endpoint, queue, types, ))
         p.start()
 
     toremove = []
@@ -690,6 +799,7 @@ def get_single_source_rdfmts(enpointmaps, outqueue=Queue()):
                 f.close()
         except Exception as e:
             print("WARN: exception while writing single source molecules:", endpoint, e)
+            logger.error("WARN: exception while writing single source molecules:" + endpoint  + " " + str(e))
 
     return rdfmolecules
 
@@ -768,10 +878,99 @@ def endpointsAccessible(endpoints):
     return found
 
 
+def create_rdfmts(endpoints, pathToOutput, types=[]):
+    if pathToOutput is None:
+        pathToOutput = '/data/rdfmts_' + str(random.randint(1, 5000)) + ".json"
+    if os.path.exists(pathToOutput):
+        if 'json' in pathToOutput[:-5]:
+            pathToOutput = pathToOutput[:5]
+        pathToOutput += '_ ' + str(random.randint(1, 5000)) + ".json"
+
+    if len(endpoints) == 0:
+        logger.error("Endpoints list should have at least one url")
+        print("Endpoints list should have at least one url")
+        return pathToOutput, [], -1
+
+    endpoints = [e.strip('\n') for e in endpoints]
+    if not endpointsAccessible(endpoints):
+        logger.error("None of the endpoints can be accessed. Please check if you write URLs properly!")
+        print("None of the endpoints can be accessed. Please check if you write URLs properly!")
+        return pathToOutput, [], -2
+
+    emaps = {}
+    for e in endpoints:
+        print("Parsing: ", e)
+        logger.info("Parsing: " + e)
+        val = e.replace('/', '_').replace(':', '_')
+        emaps[e] = val +".json"
+
+    rdfmts = get_single_source_rdfmts(emaps, types=types)
+    eofflags = list()
+    processes = []
+    for endpoint1 in rdfmts:
+        for endpoint2 in rdfmts:
+            if endpoint1 == endpoint2:
+                continue
+            q = Queue()
+            eofflags.append(q)
+            print("Finding inter-links between:", endpoint1, ' and ', endpoint2, ' .... ')
+            print("==============================//=========//===============================")
+
+            logger.info("Finding inter-links between:" + endpoint1 + ' and ' + endpoint2+ ' .... ')
+            logger.info("==============================//=========//===============================")
+
+            p = Process(target=get_links, args=(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2], q,))
+            p.start()
+            processes.append(p)
+            # get_links(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2])
+
+    while len(eofflags) > 0:
+        for q in eofflags:
+            eof = q.get()
+            if eof == 'EOF':
+                eofflags.remove(q)
+                break
+
+    molecules = combine_single_source_descriptions(rdfmts)
+
+    print("Inter-link extraction finished!")
+    print("Total Number of molecules =", len(molecules))
+    print("Total Number of endpoints =", len(rdfmts))
+    print("writing results to a file:", pathToOutput)
+
+    logger.info("Inter-link extraction finished!")
+    logger.info("Total Number of molecules =" + str(len(molecules)))
+    logger.info("Total Number of endpoints =" + str(len(rdfmts)))
+    logger.info("writing results to a file:" + pathToOutput)
+
+    with open(pathToOutput, 'w+') as f:
+        json.dump(molecules, f)
+        f.close()
+    print("Done!")
+    logger.info("Done!")
+    for p in processes:
+        if p.is_alive():
+            p.terminate()
+    return pathToOutput, molecules, 0
+
+
 if __name__ == "__main__":
+    # endpoints = ["http://bio2rdf.org/sparql"]
+    # types = [ "http://bio2rdf.org/drugbank_vocabulary:Drug",
+    #             "http://bio2rdf.org/drugbank_vocabulary:Target"]
+    # #         "http://bio2rdf.org/pharmgkb_vocabulary:Variation",
+    # #         "http://bio2rdf.org/pharmgkb_vocabulary:Gene",
+    # #         "http://bio2rdf.org/pubmed_vocabulary:Resource",
+    # #         "http://bio2rdf.org/pharmgkb_vocabulary:Disease",
+    # #         "http://bio2rdf.org/sider_vocabulary:Side-Effect",
+    # #         "http://bio2rdf.org/pharmgkb_vocabulary:Drug"]
+    # #
+    # print(create_rdfmts(endpoints, "/home/kemele/git/iasis/IASIS-KG/bio2rdf-DRUG-TARGET-templates.json", types))
+    # exit()
     pp = pprint.PrettyPrinter(indent=2)
     endpointfile, outputType, pathToOutput, isFromFile = get_options(sys.argv[1:])
-    #endpointfile, outputType, pathToOutput, isFromFile = "endpoint.txt", 'json', "motivtest.json", False
+    # endpointfile, outputType, pathToOutput, isFromFile = "singletemps", 'json', "iasiskg-linked.json", True
+
     if not isFromFile:
         with open(endpointfile, 'r') as f:
             endpoints = f.readlines()
@@ -797,6 +996,7 @@ if __name__ == "__main__":
 
     # TODO: NestedHashJoinFilter to find links between datasets
     eofflags = list()
+    processes = []
     for endpoint1 in rdfmts:
         for endpoint2 in rdfmts:
             if endpoint1 == endpoint2:
@@ -807,6 +1007,7 @@ if __name__ == "__main__":
             print("==============================//=========//===============================")
             p = Process(target=get_links, args=(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2], q,))
             p.start()
+            processes.append(p)
             #get_links(endpoint1, rdfmts[endpoint1], endpoint2, rdfmts[endpoint2])
 
     while len(eofflags) > 0:
@@ -820,9 +1021,13 @@ if __name__ == "__main__":
     print("Inter-link extraction finished!")
     print("Total Number of molecules =", len(molecules))
     print("Total Number of endpoints =", len(rdfmts))
-
+    print("writing results to a file:")
     with open(pathToOutput, 'w+') as f:
         json.dump(molecules, f)
         f.close()
+    for p in processes:
+        if p.is_alive():
+            p.terminate()
+    print("Done!")
 
-    exit(0)
+    exit(1)

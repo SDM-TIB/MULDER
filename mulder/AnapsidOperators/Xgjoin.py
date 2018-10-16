@@ -125,7 +125,10 @@ class Xgjoin(Join):
             #print(tuple)
             for var in self.vars:
                 if var in tuple:
-                    resource = resource + str(tuple[var])
+                    val = tuple[var]
+                    if "^^<" in val:
+                        val = val[:val.find('^^<')]
+                    resource = resource + str(val)
 
             # Probe the tuple against its RJT table.
             probeTS = self.probe(tuple, resource, tuple_rjttable)
@@ -268,7 +271,6 @@ class Xgjoin(Join):
         st = ""
         probed = False
 
-
         for rjt2 in rjts2:
             (tuple2, probeTS2, insertTS2, flushTS2) = rjt2.split('|')
             probedStage1 = False
@@ -332,7 +334,7 @@ class Xgjoin(Join):
         flushTS = time()
 
         # Update file descriptor
-        if (file_descriptor.has_key(resource_to_flush)):
+        if (resource_to_flush in file_descriptor):
             lentail = file_descriptor[resource_to_flush].size
             file = open(file_descriptor[resource_to_flush].file.name, 'a')
             file_descriptor.update({resource_to_flush: FileDescriptor(file, len(tail_to_flush.records) + lentail, flushTS)})
@@ -356,7 +358,6 @@ class Xgjoin(Join):
         # Delete resource from main memory.
         del table[resource_to_flush]
 
-
     def getVictim(self, table):
         # Selects a victim from a partition in main memory to flush.
 
@@ -364,7 +365,7 @@ class Xgjoin(Join):
         tail_to_flush = RJTTail([], 0)
         least_ts = float("inf")
 
-        for resource, tail in table.iteritems():
+        for resource, tail in table.items():
             resource_ts = tail.rjtProbeTS
             if ((resource_ts < least_ts) or
                 (resource_ts == least_ts and len(tail.records) > len(tail_to_flush.records))):
@@ -409,7 +410,7 @@ class Xgjoin(Join):
 
         largestRJTs = {}
 
-        for resource, fd in file_descriptor.iteritems():
+        for resource, fd in file_descriptor.items():
             if (fd.size == max_len):
                 largestRJTs[resource] = fd
 

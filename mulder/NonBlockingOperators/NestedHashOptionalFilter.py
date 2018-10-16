@@ -142,7 +142,10 @@ class NestedHashOptionalFilter(Optional):
     def getResource(self, tuple):
         resource = ''
         for var in self.vars:
-            resource = resource + tuple[var]
+            val = tuple[var]
+            if "^^<" in val:
+                val = val[:val.find('^^<')]
+            resource = resource + val
         return resource
 
     def makeInstantiation(self, filter_bag, operator):

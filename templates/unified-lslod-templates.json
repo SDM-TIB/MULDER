@@ -1,33 +1,56 @@
 [
   {
-  "rootType": "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/drugs",
-  "linkedTo": [
+    "rootType": "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/drugs",
+    "linkedTo": [
       "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs",
       "http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/drugs"
-  ],
-  "wrappers": [
-    {"url": "http://0.0.0.0:11799/sparql",
-      "predicates": [
-        "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "http://www.w3.org/2000/01/rdf-schema#label",
-        "http://www.w3.org/2002/07/owl#sameAs",
-        "http://xmlns.com/foaf/0.1/name",
-        "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/drugType",
-        "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/medicareId"],
+    ],
+    "wrappers": [
+      {
+        "url": "http://10.114.113.18:11110/sparql",
+        "predicates": [
+          "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          "http://www.w3.org/2000/01/rdf-schema#label",
+          "http://www.w3.org/2002/07/owl#sameAs",
+          "http://xmlns.com/foaf/0.1/name",
+          "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/drugType",
+          "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/medicareId"
+        ],
         "urlparam": "",
-        "wrapperType": "SPARQLEndpoint"}],
-  "predicates": [
-        {"predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "range": []},
-        {"predicate": "http://www.w3.org/2000/01/rdf-schema#label", "range": []},
-        {"predicate": "http://www.w3.org/2002/07/owl#sameAs", "range": [
-           "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs",
+        "wrapperType": "SPARQLEndpoint"
+      }
+    ],
+    "predicates": [
+      {
+        "predicate": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+        "range": []
+      },
+      {
+        "predicate": "http://www.w3.org/2000/01/rdf-schema#label",
+        "range": []
+      },
+      {
+        "predicate": "http://www.w3.org/2002/07/owl#sameAs",
+        "range": [
+          "http://www4.wiwiss.fu-berlin.de/drugbank/resource/drugbank/drugs",
           "http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/drugs"
-        ]},
-        {"predicate": "http://xmlns.com/foaf/0.1/name", "range": []},
-        {"predicate": "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/drugType", "range": []},
-        {"predicate": "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/medicareId", "range": []}],
-   "subclass": []
-   },
+        ]
+      },
+      {
+        "predicate": "http://xmlns.com/foaf/0.1/name",
+        "range": []
+      },
+      {
+        "predicate": "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/drugType",
+        "range": []
+      },
+      {
+        "predicate": "http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/medicareId",
+        "range": []
+      }
+    ],
+    "subclass": []
+  },
   {
     "rootType": "http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/organization",
     "linkedTo": [
@@ -36,7 +59,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11793/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -83,7 +106,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11793/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -244,7 +267,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11793/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -282,7 +305,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11794/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -375,10 +398,12 @@
   },
   {
     "rootType": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/genes",
-    "linkedTo": ["http://tcga.deri.ie/schema/expression_gene_lookup"],
+    "linkedTo": [
+      "http://tcga.deri.ie/schema/expression_gene_lookup"
+    ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11794/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -411,7 +436,9 @@
       },
       {
         "predicate": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/geneId",
-        "range": ["http://tcga.deri.ie/schema/expression_gene_lookup"]
+        "range": [
+          "http://tcga.deri.ie/schema/expression_gene_lookup"
+        ]
       },
       {
         "predicate": "http://www4.wiwiss.fu-berlin.de/diseasome/resource/diseasome/hgncId",
@@ -431,7 +458,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11795/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -478,7 +505,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11795/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -721,7 +748,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11795/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1142,7 +1169,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11795/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1193,7 +1220,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11795/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1231,7 +1258,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11800/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1283,7 +1310,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11800/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1352,7 +1379,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11791/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1581,7 +1608,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11792/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -1762,7 +1789,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/chromosome",
@@ -1838,7 +1865,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/chromosome",
@@ -1901,7 +1928,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -3188,7 +3215,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/chromosome",
@@ -3229,7 +3256,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/protein_expression_value",
@@ -3292,7 +3319,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -4573,7 +4600,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_sample_barcode",
@@ -4686,7 +4713,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -5967,7 +5994,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_sample_barcode",
@@ -6037,7 +6064,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/amount",
@@ -6132,7 +6159,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/amount",
@@ -6260,7 +6287,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -7564,7 +7591,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -8867,7 +8894,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_drug_barcode",
@@ -9367,7 +9394,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_sample_barcode",
@@ -9522,7 +9549,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_sample_barcode",
@@ -9620,7 +9647,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -10674,7 +10701,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_aliquot_barcode",
@@ -11966,7 +11993,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/scaled_estimate",
@@ -12007,7 +12034,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/chromosome",
@@ -12052,7 +12079,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_sample_barcode",
@@ -12214,7 +12241,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_drug_barcode",
@@ -12687,7 +12714,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11796/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -12777,7 +12804,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11796/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -12865,7 +12892,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11796/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -12943,7 +12970,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11796/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -13029,7 +13056,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11798/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://tcga.deri.ie/schema/bcr_patient_barcode",
@@ -13493,7 +13520,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -13547,7 +13574,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -13593,7 +13620,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -13629,7 +13656,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -13688,7 +13715,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14003,7 +14030,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14039,7 +14066,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14085,7 +14112,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14136,7 +14163,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14187,7 +14214,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14223,7 +14250,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14284,7 +14311,7 @@
     "linkedTo": [],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",
@@ -14327,7 +14354,7 @@
     ],
     "wrappers": [
       {
-        "url": "http://0.0.0.0:11797/sparql",
+        "url": "http://10.114.113.18:11110/sparql",
         "predicates": [
           "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           "http://www.w3.org/2000/01/rdf-schema#label",

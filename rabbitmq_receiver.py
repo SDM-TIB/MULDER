@@ -45,18 +45,19 @@ def run_program(m):
 
 
 def open_output_connection():
+    credentials = pika.PlainCredentials('guest', 'test12')
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=os.environ['RABBITMQ_IP'], port=os.environ['RABBITMQ_PORT']))
+        pika.ConnectionParameters(host=os.environ['RABBITMQ_IP'], port=os.environ['RABBITMQ_PORT'], credentials=credentials))
     channel = connection.channel()
-    channel.queue_declare(queue='iasis.orchestrator.queue')
+    channel.queue_declare(queue='iasis.ontario.queue', durable=True)
 
     return connection, channel
 
 
 def produce_output(message):
     connection, channel = open_output_connection()
-    channel.basic_publish(exchange='iasis.orchestrator.direct',
-                          routing_key='iasis.orchestrator.routingkey',
+    channel.basic_publish(exchange='iasis.ui.queue',
+                          routing_key='iasis.ontario.routingkey',
                           body=message)
     # channel.basic_publish(exchange='iasis.ontario.output.direct',
     #                       routing_key='iasis.ontario.output.routingkey',
@@ -155,14 +156,15 @@ def callback(ch, method, properties, body):
 
 
 def consumer(fcallback):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RABBITMQ_IP'], port=os.environ['RABBITMQ_PORT']))
+    credentials = pika.PlainCredentials('guest', 'test12')
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=os.environ['RABBITMQ_IP'], port=os.environ['RABBITMQ_PORT'], credentials=credentials))
     channel = connection.channel()
 
-    channel.exchange_declare(exchange='iasis.ontario.direct', exchange_type='direct')
+    channel.exchange_declare(exchange='iasis.ui.queue', exchange_type='direct', durable=True, auto_delete=False)
 
     queue_name = 'iasis.ontario.queue'
-    channel.queue_declare(queue=queue_name)
-    channel.queue_bind(exchange='iasis.ontario.direct', queue=queue_name, routing_key='iasis.ontario.routingkey')
+    channel.queue_declare(queue=queue_name, durable=True, auto_delete=False)
+    channel.queue_bind(exchange='iasis.ui.queue', queue=queue_name, routing_key='iasis.ontario.routingkey')
 
     channel.basic_consume(fcallback,  queue=queue_name, no_ack=True)
 

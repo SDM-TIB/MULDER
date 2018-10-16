@@ -371,7 +371,7 @@ class MediatorDecomposer(object):
             joins.append([JoinBlock([Service("<" + url + ">", triplepatterns)]) for url in sourceindex])
 
         if len(joins) > 0:
-            servs.append(UnionBlock(joins))
+            servs.append(UnionBlock([UnionBlock(joins)]))
         return servs
 
     def getMTsConnection(self, selectedmolecules):

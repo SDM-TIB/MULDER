@@ -13,12 +13,30 @@ from mulder.molecule.MTManager import ConfigFile
 from mulder.mediator.decomposition.MediatorDecomposer import MediatorDecomposer
 from mulder.mediator.planner.MediatorPlanner import MediatorPlanner
 from mulder.mediator.planner.MediatorPlanner import contactSource as clm
+import logging
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logger = logging.getLogger()
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    fileHandler = logging.FileHandler("{0}.log".format('ontario'))
+    fileHandler.setLevel(logging.INFO)
+    fileHandler.setFormatter(logFormatter)
+
+    logger.addHandler(fileHandler)
+
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setLevel(logging.INFO)
+    consoleHandler.setFormatter(logFormatter)
+    logger.addHandler(consoleHandler)
+
+
+
 __author__ = 'kemele'
 
 app = Flask(__name__)
 configuration = None
 tempType = "MULDER"
-configfile = '/MULDER/defaultconfig.json'
+configfile = '/home/kemele/git/MULDER/config/config.json'
 
 
 @app.route("/sparql", methods=['POST', 'GET'])
@@ -28,6 +46,8 @@ def sparql():
             query = request.args.get("query", '')
             # query = query.replace('\n', ' ').replace('\r', ' ')
             print('query:', query)
+            logger.info(query)
+
             global configuration
             # if session['configuration'] is None:
             #     configuration = ConfigFile(configfile)
@@ -35,12 +55,13 @@ def sparql():
             #     configuration = session.get('configuration')
             if configuration is None:
                 configuration = ConfigFile(configfile)
-            if query is None:
+            if query is None or len(query) == 0:
                 return jsonify({"result": [], "error": "cannot read query"})
             start = time()
             dc = MediatorDecomposer(query, configuration, tempType)
             quers = dc.decompose()
             print ("Mediator Decomposer: \n", quers)
+            logger.info(quers)
             if quers is None:
                 print("Query decomposer returns None")
                 return jsonify({"result": []})
@@ -49,6 +70,7 @@ def sparql():
             planner = MediatorPlanner(quers, True, clm, None, configuration)
             plan = planner.createPlan()
             print ("Mediator Planner: \n", plan)
+            logger.info(plan)
             output = Queue()
 
             plan.execute(output)
@@ -73,7 +95,7 @@ def sparql():
         except Exception as e:
             print ("Exception: ", e)
             print ({"result": [], "error": e})
-            return jsonify({"result": [], "error": e})
+            return jsonify({"result": [], "error": str(e)})
     else:
         return jsonify({"result": [], "error": "Invalid HTTP method used. Use GET "})
 
@@ -119,7 +141,7 @@ if __name__ == "__main__":
     try:
         conf = ConfigFile(configfile)
     except:
-        conf = ConfigFile("/MULDER/defaultconfig.json")
+        conf = ConfigFile("/home/kemele/git/MULDER/config/config.json")
         print("The default DBpedia template is loaded")
     port = 5000
     # config = json.load(open(configfile))

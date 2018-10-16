@@ -6,7 +6,7 @@ PREFIX purl: <http://purl.org/dc/elements/1.1/>
 PREFIX kegg: <http://bio2rdf.org/ns/kegg#>
 SELECT ?drug ?transform ?mass
 WHERE {
-?drug drugbank:affectedOrganism 'Humans and other mammals' .
+?drug drugbank:affectedOrganism "Humans and other mammals" .
 ?drug drugbank:casRegistryNumber ?cas.
 ?keggDrug bio2RDF:xRef ?cas .
 ?keggDrug bio2RDF:mass ?mass .

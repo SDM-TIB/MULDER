@@ -132,7 +132,10 @@ class NestedHashJoinFilter(Join):
     def getResource(self, tuple):
         resource = ''
         for var in self.vars:
-            resource = resource + tuple[var]
+            val = tuple[var]
+            if "^^<" in val:
+                val = val[:val.find('^^<')]
+            resource = resource + val
         return resource
 
     def makeInstantiation(self, filter_bag, operators):
@@ -152,10 +155,18 @@ class NestedHashJoinFilter(Join):
                     v = tuple[var]
                     if v.find("http") == 0:  # uris must be passed between < .. >
                         v = "<" + v + ">"
+                        v = "?" + var + "=" + v
+                        and_expr.append(v)
                     else:
-                        v = '"' + v + '"'
-                    v = "?" + var + "=" + v
-                    and_expr.append(v)
+                        if '^^<' not in v:
+                            v = '"' + v + '"'
+                            vf = "(?" + var + "=" + v + " || " + "?" + var + "=" + v + "^^<http://www.w3.org/2001/XMLSchema#string>)"
+                            and_expr.append(vf)
+                        else:
+                            loc = v.find('^^<')
+                            vf = '"' + v[:loc] + '"' + v[loc:]
+                            v = "(?" + var + "=" + vf + ' || ' + "?" + var + '="' + v[:loc] + '")'
+                            and_expr.append(v)
 
                 or_expr.append('(' + ' && '.join(and_expr) + ')')
             filter_str = filter_str.replace('__expr__', ' || '.join(or_expr))

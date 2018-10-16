@@ -157,7 +157,7 @@ def usage():
                  "\t<isstring> - (Optional) set if <query> is sent as string: \n"
                  "\t\tavailable values 1 or -1. -1 is default, meaning query is from file\n")
 
-    print (usage_str.format(program=sys.argv[0]),)
+    print(usage_str.format(program=sys.argv[0]),)
 
 
 if __name__ == '__main__':
@@ -168,12 +168,12 @@ if __name__ == '__main__':
     # else:
     #     queryss = open(query).read()
     #
-    query = open('templates/testq1').read()
-    config = 'config/metis9config.json'
-    planonly = True
+    query = open('queries/QP2.txt').read()
+    config = 'config/lslod-semep3rd-config.json'
+    planonly = False
     config = ConfigFile(config)
     tempType = "MULDER"
-    joinstarslocally = False
+    joinstarslocally = True
 
     global time1
     global qname
@@ -214,31 +214,31 @@ if __name__ == '__main__':
     print(plan)
 
     output = Queue()
-    # plan.execute(output)
+    plan.execute(output)
     print ("*+*+*+*+*+*+*+*+*+*+*+*+Result*+*+*+*+*+*+*+++++")
-    i = 0
-    p2 = Process(target=plan.execute, args=(output,))
-    p2.start()
-    p3 = Process(target=conclude, args=(output, p2, True, False))
-    p3.start()
-    signal.signal(12, onSignal1)
-
-    while True:
-        if p2.is_alive() and not p3.is_alive():
-            try:
-                os.kill(p2.pid, 9)
-            except Exception as ex:
-                continue
-            break
-        elif not p2.is_alive() and not p3.is_alive():
-            break
-
-
+    # i = 0
+    # p2 = Process(target=plan.execute, args=(output,))
+    # p2.start()
+    # p3 = Process(target=conclude, args=(output, p2, True, False))
+    # p3.start()
+    # signal.signal(12, onSignal1)
+    #
     # while True:
-    #     r = output.get()
-    #     i += 1
-    #     #print r
-    #     if r == "EOF":
-    #         print "END of results ...."
+    #     if p2.is_alive() and not p3.is_alive():
+    #         try:
+    #             os.kill(p2.pid, 9)
+    #         except Exception as ex:
+    #             continue
     #         break
-    #     #print "total: ", i
+    #     elif not p2.is_alive() and not p3.is_alive():
+    #         break
+
+    i =0
+    while True:
+        r = output.get()
+        i += 1
+        print(r)
+        if r == "EOF":
+            print("END of results ....")
+            break
+        #print "total: ", i

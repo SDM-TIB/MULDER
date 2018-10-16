@@ -36,6 +36,8 @@ class Config(object):
         for p in preds:
             if p in self.predidx:
                 res.append(self.predidx[p])
+        if len(res) != len(preds):
+            return []
         for r in res[1:]:
             res[0] = res[0].intersection(r)
 
