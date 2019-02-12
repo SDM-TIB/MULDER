@@ -9,7 +9,7 @@ Requirements:
 Running
 -----------
 
-    ```
+    ```bash
     ./create_rdfmts.py -s <endpoints-file>  -o <output-filename.json>  
     ```
 

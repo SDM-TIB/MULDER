@@ -21,7 +21,7 @@ MULDER runs on Debian GNU/Linux and OS X and Python 3.5
 
 4. Install MULDER:
 
-    `python setup.py install`
+    `python3 setup.py install`
 
 Configure MULDER
 ================
@@ -37,7 +37,10 @@ Configure MULDER
 
 2. Run RDF molecule template extractor in `scripts` folder:
 
-    `scripts$ python3.5 collect_rdfmts.py -e endpoints.txt -o json -p 'templates/mytemplates.json'`
+   
+    ```bash
+    ./create_rdfmts.py -s endpoints.txt  -o  templates/mytemplates.json>
+    ```
 
 3. Create configuration file, `config.json` in `config` folder:
 
@@ -91,4 +94,5 @@ you can start running MULDER using the following script:
  References
  =========
  
- `Endris, Kemele M., Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. "MULDER: Querying the Linked Data Web by Bridging RDF Molecule Templates." In International Conference on Database and Expert Systems Applications, pp. 3-18. Springer, Cham, 2017.`
+ - `Endris, Kemele M., Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. "MULDER: Querying the Linked Data Web by Bridging RDF Molecule Templates." In International Conference on Database and Expert Systems Applications, pp. 3-18. Springer, Cham, 2017.`
+ - `Endris, Kemele M., Mikhail Galkin, Ioanna Lytra, Mohamed Nadjib Mami, Maria-Esther Vidal, and Sören Auer. "Querying Interlinked Data by Bridging RDF Molecule Templates." In Transactions on Large-Scale Data-and Knowledge-Centered Systems XXXIX, pp. 1-42. Springer, Berlin, Heidelberg, 2018.`
