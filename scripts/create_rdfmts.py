@@ -1,0 +1,564 @@
+#!/usr/bin/env python3.5
+
+import getopt, sys
+from pprint import pprint
+import rdflib
+from enum import Enum
+import json
+import logging
+import time
+import urllib.parse as urlparse
+import http.client as htclient
+from http import HTTPStatus
+import requests
+
+
+xsd = "http://www.w3.org/2001/XMLSchema#"
+owl = ""
+rdf = ""
+rdfs = "http://www.w3.org/2000/01/rdf-schema#"
+
+
+metas = ['http://www.w3.org/ns/sparql-service-description',
+         'http://www.openlinksw.com/schemas/virtrdf#',
+         'http://www.w3.org/2000/01/rdf-schema#',
+         'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+         'http://purl.org/dc/terms/Dataset',
+         'http://bio2rdf.org/dataset_vocabulary:Endpoint',
+         'http://www.w3.org/2002/07/owl#',
+         "http://purl.org/goodrelations/",
+         'http://www.ontologydesignpatterns.org/ont/d0.owl#',
+         'http://www.wikidata.org/',
+         'http://dbpedia.org/ontology/Wikidata:',
+         'http://dbpedia.org/class/yago/',
+         "http://rdfs.org/ns/void#",
+         'http://www.w3.org/ns/dcat',
+         'http://www.w3.org/2001/vcard-rdf/',
+         'http://www.ebusiness-unibw.org/ontologies/eclass',
+         "http://bio2rdf.org/bio2rdf.dataset_vocabulary:Dataset",
+         'http://www4.wiwiss.fu-berlin.de/bizer/bsbm/v01/instances/',
+         'nodeID://']
+
+
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logger = logging.getLogger("rdfmts")
+logger.setLevel(logging.INFO)
+fileHandler = logging.FileHandler("{0}/{1}.log".format('.', 'mulder-rdfmts-log'))
+fileHandler.setLevel(logging.INFO)
+fileHandler.setFormatter(logFormatter)
+logger.addHandler(fileHandler)
+consoleHandler = logging.StreamHandler()
+consoleHandler.setLevel(logging.INFO)
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
+
+
+def contactRDFSource(query, endpoint, format="application/sparql-results+json"):
+    if 'https' in endpoint:
+        server = endpoint.split("https://")[1]
+    else:
+        server = endpoint.split("http://")[1]
+
+    (server, path) = server.split("/", 1)
+    # Formats of the response.
+    json = format
+    # Build the query and header.
+    params = urlparse.urlencode({'query': query, 'format': json, 'timeout': 10000000})
+    headers = {"Accept": "*/*", "Referer": endpoint, "Host": server}
+
+    try:
+        resp = requests.get(endpoint, params=params, headers=headers)
+        if resp.status_code == HTTPStatus.OK:
+            res = resp.text
+            reslist = []
+            if format != "application/sparql-results+json":
+                return res
+
+            try:
+                res = res.replace("false", "False")
+                res = res.replace("true", "True")
+                res = eval(res)
+            except Exception as ex:
+                print("EX processing res", ex)
+
+            if type(res) is dict:
+                if "results" in res:
+                    for x in res['results']['bindings']:
+                        for key, props in x.items():
+                            # Handle typed-literals and language tags
+                            suffix = ''
+                            if props['type'] == 'typed-literal':
+                                if isinstance(props['datatype'], bytes):
+                                    suffix = '' # "^^<" + props['datatype'].decode('utf-8') + ">"
+                                else:
+                                    suffix = '' # "^^<" + props['datatype'] + ">"
+                            elif "xml:lang" in props:
+                                suffix = '' # '@' + props['xml:lang']
+                            try:
+                                if isinstance(props['value'], bytes):
+                                    x[key] = props['value'].decode('utf-8') + suffix
+                                else:
+                                    x[key] = props['value'] + suffix
+                            except:
+                                x[key] = props['value'] + suffix
+
+                            if isinstance(x[key], bytes):
+                                x[key] = x[key].decode('utf-8')
+                        reslist.append(x)
+                    # reslist = res['results']['bindings']
+                    return reslist, len(reslist)
+                else:
+
+                    return res['boolean'], 1
+
+        else:
+            print("Endpoint->", endpoint, resp.reason, resp.status_code, query)
+
+    except Exception as e:
+        print("Exception during query execution to", endpoint, ': ', e)
+
+    return None, -2
+
+
+def get_typed_concepts(endpoint, limit=-1, types=[]):
+    """
+    Entry point for extracting RDF-MTs of an endpoint.
+    Extracts list of rdf:Class concepts and predicates of an endpoint
+    :param endpoint:
+    :param limit:
+    :return:
+    """
+    referer = endpoint
+    reslist = []
+    if len(types) == 0:
+        query = "SELECT DISTINCT ?t  WHERE{  ?s a ?t.   }"
+        if limit == -1:
+            limit = 100
+            offset = 0
+            numrequ = 0
+            while True:
+                query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+                res, card = contactRDFSource(query_copy, referer)
+                numrequ += 1
+                if card == -2:
+                    limit = limit // 2
+                    limit = int(limit)
+                    if limit < 1:
+                        break
+                    continue
+                if card > 0:
+                    reslist.extend(res)
+                if card < limit:
+                    break
+                offset += limit
+                time.sleep(5)
+        else:
+            reslist, card = contactRDFSource(query, referer)
+
+        toremove = []
+        # [toremove.append(r) for v in metas for r in reslist if v in r['t']]
+        for r in reslist:
+            for m in metas:
+                if m in str(r['t']):
+                    toremove.append(r)
+
+        for r in toremove:
+            reslist.remove(r)
+    else:
+        reslist = [{'t': t} for t in types]
+
+    logger.info(endpoint)
+    pprint(reslist)
+
+    molecules = []
+    for r in reslist:
+        t = r['t']
+        if "^^" in t:
+            continue
+        print(t)
+        print("---------------------------------------")
+        logger.info(t)
+
+        rdfpropteries = []
+        # Get predicates of the molecule t
+        preds = get_predicates(referer, t)
+        predicates = []
+        linkedto = []
+        for p in preds:
+            pred = p['p']
+            predicates.append(pred)
+
+            # Get range of this predicate from this RDF-MT t
+            ranges = get_rdfs_ranges(referer, pred)
+            if len(ranges) == 0:
+                rr = find_instance_range(referer, t, pred)
+                mtranges = list(set(ranges + rr))
+            else:
+                mtranges = ranges
+            ranges = []
+
+            for mr in mtranges:
+                if '^^' in mr:
+                    continue
+                if xsd not in mr:
+                    ranges.append(mr)
+
+            linkedto.extend(ranges)
+            logger.info(pred + str(ranges))
+            rdfpropteries.append({
+                "predicate": pred,
+                "range": ranges
+            })
+
+        rdfmt = {
+            "rootType": t,
+            "predicates": rdfpropteries,
+            "linkedTo": linkedto,
+            "wrappers": [{
+                'url': endpoint,
+                'predicates': predicates,
+                "urlparam": "",
+                "wrapperType": "SPARQLEndpoint"
+
+            }]
+        }
+        molecules.append(rdfmt)
+
+    logger.info("=================================")
+
+    return molecules
+
+
+def get_rdfs_ranges(referer, p, limit=-1):
+
+    RDFS_RANGES = " SELECT DISTINCT ?range" \
+                  "  WHERE{ <" + p + "> <http://www.w3.org/2000/01/rdf-schema#range> ?range. " \
+                                     "} "
+    #
+    # " " \
+
+    reslist = []
+    if limit == -1:
+        limit = 100
+        offset = 0
+        numrequ = 0
+        while True:
+            query_copy = RDFS_RANGES + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+            res, card = contactRDFSource(query_copy, referer)
+            numrequ += 1
+            if card == -2:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
+                    break
+                continue
+            if card > 1:
+                reslist.extend(res)
+            if card < limit:
+                break
+            offset += limit
+            time.sleep(2)
+    else:
+        reslist, card = contactRDFSource(RDFS_RANGES, referer)
+
+    ranges = []
+
+    for r in reslist:
+        skip = False
+        for m in metas:
+            if m in r['range']:
+                skip = True
+                break
+        if not skip:
+            ranges.append(r['range'])
+
+    return ranges
+
+
+def find_instance_range(referer, t, p, limit=-1):
+
+    INSTANCE_RANGES = " SELECT DISTINCT ?r WHERE{ ?s a <" + t + ">. " \
+                        " ?s <" + p + "> ?pt. " \
+                        " ?pt a ?r . } "
+    #
+    #
+    reslist = []
+    if limit == -1:
+        limit = 50
+        offset = 0
+        numrequ = 0
+        while True:
+            query_copy = INSTANCE_RANGES + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+            res, card = contactRDFSource(query_copy, referer)
+            numrequ += 1
+            if card == -2:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
+                    break
+                continue
+            if card > 0:
+                reslist.extend(res)
+            if card < limit:
+                break
+            offset += limit
+            time.sleep(2)
+    else:
+        reslist, card = contactRDFSource(INSTANCE_RANGES, referer)
+
+    ranges = []
+
+    for r in reslist:
+        skip = False
+        for m in metas:
+            if m in r['r']:
+                skip = True
+                break
+        if not skip:
+            ranges.append(r['r'])
+
+    return ranges
+
+
+def get_predicates(referer, t, limit=-1):
+    """
+    Get list of predicates of a class t
+
+    :param referer: endpoint
+    :param server: server address of an endpoint
+    :param path:  path in an endpoint (after server url)
+    :param t: RDF class Concept extracted from an endpoint
+    :param limit:
+    :return:
+    """
+    #
+    query = " SELECT DISTINCT ?p WHERE{ ?s a <" + t + ">. ?s ?p ?pt.  } "
+    reslist = []
+    if limit == -1:
+        limit = 50
+        offset = 0
+        numrequ = 0
+        print(t)
+        while True:
+            query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+            res, card = contactRDFSource(query_copy, referer)
+            numrequ += 1
+            # print "predicates card:", card
+            if card == -2:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
+                    print("giving up on " + query)
+                    print("trying instances .....")
+                    rand_inst_res = get_preds_of_random_instances(referer, t)
+                    existingpreds = [r['p'] for r in reslist]
+                    for r in rand_inst_res:
+                        if r not in existingpreds:
+                            reslist.append({'p': r})
+                    break
+                continue
+            if card > 0:
+                reslist.extend(res)
+            if card < limit:
+                break
+            offset += limit
+            time.sleep(2)
+    else:
+        reslist, card = contactRDFSource(query, referer)
+
+    return reslist
+
+
+def get_preds_of_random_instances(referer, t, limit=-1):
+
+    """
+    get a union of predicated from 'randomly' selected 10 entities from the first 100 subjects returned
+
+    :param referer: endpoint
+    :param server:  server name
+    :param path: path
+    :param t: rdf class concept of and endpoint
+    :param limit:
+    :return:
+    """
+    query = " SELECT DISTINCT ?s WHERE{ ?s a <" + t + ">. } "
+    reslist = []
+    if limit == -1:
+        limit = 50
+        offset = 0
+        numrequ = 0
+        while True:
+            query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+            res, card = contactRDFSource(query_copy, referer)
+            numrequ += 1
+            # print "rand predicates card:", card
+            if card == -2:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
+                    break
+                continue
+            if numrequ == 100:
+                break
+            if card > 0:
+                import random
+                rand = random.randint(0, card - 1)
+                inst = res[rand]
+                inst_res = get_preds_of_instance(referer, inst['s'])
+                inst_res = [r['p'] for r in inst_res]
+                reslist.extend(inst_res)
+                reslist = list(set(reslist))
+            if card < limit:
+                break
+            offset += limit
+            time.sleep(5)
+    else:
+        reslist, card = contactRDFSource(query, referer)
+
+    return reslist
+
+
+def get_preds_of_instance(referer, inst, limit=-1):
+    query = " SELECT DISTINCT ?p WHERE{ <" + inst + "> ?p ?pt. } "
+    reslist = []
+    if limit == -1:
+        limit = 1000
+        offset = 0
+        numrequ = 0
+        while True:
+            query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+            res, card = contactRDFSource(query_copy, referer)
+            numrequ += 1
+            # print "inst predicates card:", card
+            if card == -2:
+                limit = limit // 2
+                limit = int(limit)
+                # print "setting limit to: ", limit
+                if limit < 1:
+                    break
+                continue
+            if card > 0:
+                reslist.extend(res)
+            if card < limit:
+                break
+            offset += limit
+            time.sleep(2)
+    else:
+        reslist, card = contactRDFSource(query, referer)
+
+    return reslist
+
+
+def get_options(argv):
+    try:
+        opts, args = getopt.getopt(argv, "h:s:o:")
+    except getopt.GetoptError:
+        usage()
+        sys.exit(1)
+
+    '''
+    Supported output formats:
+        - json (default)       
+    '''
+
+    endpoints = None
+    output = 'config-output.json'
+    for opt, arg in opts:
+        if opt == "-h":
+            usage()
+            sys.exit()
+        elif opt == "-s":
+            endpoints = arg
+        elif opt == "-o":
+            output = arg
+
+    if not endpoints:
+        usage()
+        sys.exit(1)
+    if '.json' not in output:
+        output += '.json'
+
+    return endpoints, output
+
+
+def endpointsAccessible(endpoints):
+    ask = "ASK {?s ?p ?o}"
+    found = False
+    for e in endpoints:
+        referer = e
+        val, c = contactRDFSource(ask, referer)
+        if c == -2:
+            print(e, '-> is not accessible. Please check if this endpoint properly started!')
+            sys.exit(1)
+        if val:
+            found = True
+        else:
+            print(e, "-> is returning empty results. Hence, will not be included in the federation!")
+
+    return found
+
+
+def usage():
+    usage_str = ("Usage: {program} \n"
+                 "-s <path/to/endpoints.txt> \n"
+                 "-o <path/to/output.json> \n"
+                 "where \n"                                  
+                 "\t<path/to/endpoints.txt> - path to a text file containing a list of SPARQL endpoint URLs \n"
+                 "\t<path/to/output.json> - name of output file  \n")
+
+    print(usage_str.format(program=sys.argv[0]),)
+
+
+if __name__ == "__main__":
+    endpointsfile, output = get_options(sys.argv[1:])
+    # endpointsfile = 'endpoints.txt'
+    with open(endpointsfile, 'r') as f:
+        endpoints = f.readlines()
+        if len(endpoints) == 0:
+            print("Endpoints file should have at least one url")
+            sys.exit(1)
+
+        endpoints = [e.strip('\n') for e in endpoints]
+        if not endpointsAccessible(endpoints):
+            print("None of the endpoints can be accessed. Please check if you write URLs properly!")
+            sys.exit(1)
+    dsrdfmts = {}
+    for url in endpoints:
+        rdfmts = get_typed_concepts(url)
+        for rdfmt in rdfmts:
+            rootType = rdfmt['rootType']
+            if rootType not in dsrdfmts:
+                dsrdfmts[rootType] = rdfmt
+            else:
+                otherrdfmt = dsrdfmts[rootType]
+
+                dss = {d['url']: d for d in otherrdfmt['wrappers']}
+
+                if rdfmt['wrappers'][0]['url'] not in dss:
+                    otherrdfmt['wrappers'].extend(rdfmt['wrappers'])
+                else:
+                    pps = rdfmt['wrappers'][0]['predicates']
+                    dss[rdfmt['wrappers'][0]['url']]['predicates'].extend(pps)
+                    dss[rdfmt['wrappers'][0]['url']]['predicates'] = list(set(dss[rdfmt['wrappers'][0]['url']]['predicates']))
+                    otherrdfmt['wrappers'] = list(dss.values())
+
+                otherpreds = {p['predicate']: p for p in otherrdfmt['predicates']}
+                thispreds = {p['predicate']: p for p in rdfmt['predicates']}
+                sameps = set(otherpreds.keys()).intersection(thispreds.keys())
+                if len(sameps) > 0:
+                    for p in sameps:
+                        if len(thispreds[p]['range']) > 0:
+                            otherpreds[p]['range'].extend(thispreds[p]['range'])
+                            otherpreds[p]['range'] = list(set(otherpreds[p]['range']))
+                preds = [otherpreds[p] for p in otherpreds]
+                otherrdfmt['predicates'] = preds
+
+                otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
+
+    templates = list(dsrdfmts.values())
+    json.dump(templates, open(output, 'w+'))
+    logger.info('-----DONE!-----')
