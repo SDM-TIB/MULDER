@@ -1,1 +1,2 @@
 http://localhost:4001/sparql
+http://localhost:4003/sparql

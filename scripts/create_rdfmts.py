@@ -207,7 +207,13 @@ def get_typed_concepts(endpoint, limit=-1, types=[]):
             logger.info(pred + str(ranges))
             rdfpropteries.append({
                 "predicate": pred,
-                "range": ranges
+                "range": ranges,
+                "policies": [
+                    {
+                        "dataset": endpoint,
+                        "operator": "PR"
+                    }
+                ]
             })
 
         rdfmt = {
@@ -502,6 +508,87 @@ def endpointsAccessible(endpoints):
     return found
 
 
+def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2):
+    # print 'between endpoints:', endpoint1, ' --> ', endpoint2
+    for c in rdfmt1:
+        for p in c['predicates']:
+            reslist = get_external_links(endpoint1, c['rootType'], p['predicate'], endpoint2, rdfmt2)
+            if len(reslist) > 0:
+                # reslist = [r+"@"+endpoint2 for r in reslist]
+                c['linkedTo'].extend(reslist)
+                c['linkedTo'] = list(set(c['linkedTo']))
+                p['range'].extend(reslist)
+                p['range'] = list(set(p['range']))
+                # print 'external links found for ', c['rootType'], '->', p['predicate'], reslist
+
+
+def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
+    query = 'SELECT DISTINCT ?o  WHERE {?s a <' + rootType + '> ; <' + pred + '> ?o . FILTER (isIRI(?o))}'
+    referer = endpoint1
+
+    reslist = []
+    limit = 50
+    offset = 0
+    numrequ = 0
+    checked_inst = []
+    links_found = []
+    print("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    while True:
+        query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+        res, card = contactRDFSource(query, referer)
+        numrequ += 1
+        if card == -2:
+            limit = limit / 2
+            if limit == 0:
+                break
+
+            continue
+        if numrequ == 100:
+            break
+        if card > 0:
+            # rand = random.randint(0, card - 1)
+            # inst = res[rand]
+            #
+            # if inst['o'] in checked_inst:
+            #     offset += limit
+            #     continue
+            for inst in res:
+                for c in rdfmt2:
+                    if c['rootType'] in links_found:
+                        continue
+                    exists = link_exist(inst['o'], c['rootType'], endpoint2)
+                    checked_inst.append(inst['o'])
+                    if exists:
+                        reslist.append(c['rootType'])
+                        links_found.append(c['rootType'])
+                        print(rootType, ',', pred, '->', c['rootType'])
+            reslist = list(set(reslist))
+
+        if card < limit:
+            break
+
+        offset += limit
+
+    return reslist
+
+
+def link_exist(s, c, endpoint):
+
+    query = "ASK {<" + s + '>  a  <' + c + '> } '
+    referer = endpoint
+
+    res, card = contactRDFSource(query, referer)
+    if res is None:
+        print('bad request on, ', s, c)
+    if card > 0:
+        if res:
+            print("ASK result", res, endpoint)
+        return res
+
+    return False
+
+
 def usage():
     usage_str = ("Usage: {program} \n"
                  "-s <path/to/endpoints.txt> \n"
@@ -516,6 +603,7 @@ def usage():
 if __name__ == "__main__":
     endpointsfile, output = get_options(sys.argv[1:])
     # endpointsfile = 'endpoints.txt'
+    # output = 'tibfedmols.json'
     with open(endpointsfile, 'r') as f:
         endpoints = f.readlines()
         if len(endpoints) == 0:
@@ -527,8 +615,19 @@ if __name__ == "__main__":
             print("None of the endpoints can be accessed. Please check if you write URLs properly!")
             sys.exit(1)
     dsrdfmts = {}
+    sparqlendps = {}
     for url in endpoints:
         rdfmts = get_typed_concepts(url)
+        sparqlendps[url] = rdfmts.copy()
+
+    for e1 in sparqlendps:
+        for e2 in sparqlendps:
+            if e1 == e2:
+                continue
+            get_links(e1, sparqlendps[e1], e2, sparqlendps[e2])
+
+    for e in sparqlendps:
+        rdfmts = sparqlendps[e]
         for rdfmt in rdfmts:
             rootType = rdfmt['rootType']
             if rootType not in dsrdfmts:
