@@ -80,7 +80,7 @@ def contactRDFSource(query, endpoint, format="application/sparql-results+json"):
                 res = res.replace("true", "True")
                 res = eval(res)
             except Exception as ex:
-                print("EX processing res", ex)
+                logger.info("EX processing res", ex)
 
             if type(res) is dict:
                 if "results" in res:
@@ -113,10 +113,12 @@ def contactRDFSource(query, endpoint, format="application/sparql-results+json"):
                     return res['boolean'], 1
 
         else:
-            print("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
+            # print("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
+            logger.info("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
 
     except Exception as e:
-        print("Exception during query execution to", endpoint, ': ', e)
+        # print("Exception during query execution to", endpoint, ': ', e)
+        logger.info("Exception during query execution to", endpoint, ': ', e)
 
     return None, -2
 
@@ -536,7 +538,7 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
     referer = endpoint1
 
     reslist = []
-    limit = 50
+    limit = 45
     offset = 0
     numrequ = 0
     links_found = []
@@ -582,7 +584,7 @@ def link_exist(insts, c, endpoint):
 
     res, card = contactRDFSource(query, referer)
     if res is None:
-        print('bad request on, ', query)
+        print('bad request on, ', c, insts)
     if card > 0:
         if res:
             print("ASK result", res, c, endpoint)
