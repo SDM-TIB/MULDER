@@ -208,8 +208,8 @@ def get_typed_concepts(endpoint, tq, limit=-1, types=[]):
                 if xsd not in mr:
                     ranges.append(mr)
 
-            linkedto.extend(ranges)
-            logger.info(pred + str(ranges))
+            if len(ranges) > 0:
+                linkedto.extend(ranges)
             rdfpropteries.append({
                 "predicate": pred,
                 "range": ranges,
