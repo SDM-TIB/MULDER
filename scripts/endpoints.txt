@@ -1,2 +1,11 @@
-http://localhost:4001/sparql
-http://localhost:4003/sparql
+http://node4.research.tib.eu:12000/sparql
+http://node4.research.tib.eu:12001/sparql
+http://node4.research.tib.eu:12002/sparql
+http://node4.research.tib.eu:12003/sparql
+http://node4.research.tib.eu:12004/sparql
+http://node4.research.tib.eu:12005/sparql
+http://node4.research.tib.eu:12006/sparql
+http://node4.research.tib.eu:12007/sparql
+http://node4.research.tib.eu:12008/sparql
+http://node4.research.tib.eu:12009/sparql
+http://node4.research.tib.eu:11882/sparql

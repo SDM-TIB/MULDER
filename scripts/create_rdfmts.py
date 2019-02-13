@@ -11,7 +11,8 @@ import urllib.parse as urlparse
 import http.client as htclient
 from http import HTTPStatus
 import requests
-
+from multiprocessing import Queue, Process
+from multiprocessing.queues import Empty
 
 xsd = "http://www.w3.org/2001/XMLSchema#"
 owl = ""
@@ -112,7 +113,7 @@ def contactRDFSource(query, endpoint, format="application/sparql-results+json"):
                     return res['boolean'], 1
 
         else:
-            print("Endpoint->", endpoint, resp.reason, resp.status_code, query)
+            print("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
 
     except Exception as e:
         print("Exception during query execution to", endpoint, ': ', e)
@@ -120,7 +121,7 @@ def contactRDFSource(query, endpoint, format="application/sparql-results+json"):
     return None, -2
 
 
-def get_typed_concepts(endpoint, limit=-1, types=[]):
+def get_typed_concepts(endpoint, tq, limit=-1, types=[]):
     """
     Entry point for extracting RDF-MTs of an endpoint.
     Extracts list of rdf:Class concepts and predicates of an endpoint
@@ -231,6 +232,8 @@ def get_typed_concepts(endpoint, limit=-1, types=[]):
         molecules.append(rdfmt)
 
     logger.info("=================================")
+    tq.put(molecules)
+    tq.put("EOF")
 
     return molecules
 
@@ -508,18 +511,24 @@ def endpointsAccessible(endpoints):
     return found
 
 
-def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2):
+def get_links(endpoint1, rdfmt1, endpoint2, rdfmt2, q):
     # print 'between endpoints:', endpoint1, ' --> ', endpoint2
+    found = False
     for c in rdfmt1:
         for p in c['predicates']:
             reslist = get_external_links(endpoint1, c['rootType'], p['predicate'], endpoint2, rdfmt2)
             if len(reslist) > 0:
+                found = True
                 # reslist = [r+"@"+endpoint2 for r in reslist]
                 c['linkedTo'].extend(reslist)
                 c['linkedTo'] = list(set(c['linkedTo']))
                 p['range'].extend(reslist)
                 p['range'] = list(set(p['range']))
                 # print 'external links found for ', c['rootType'], '->', p['predicate'], reslist
+    if found:
+        q.put(rdfmt1)
+    else:
+        q.put([])
 
 
 def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
@@ -530,60 +539,53 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
     limit = 50
     offset = 0
     numrequ = 0
-    checked_inst = []
     links_found = []
-    print("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
-    print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    # print("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
     while True:
         query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
-        res, card = contactRDFSource(query, referer)
+        res, card = contactRDFSource(query_copy, referer)
         numrequ += 1
         if card == -2:
-            limit = limit / 2
-            if limit == 0:
+            limit = limit // 2
+            if limit < 1:
                 break
-
             continue
         if numrequ == 100:
             break
         if card > 0:
-            # rand = random.randint(0, card - 1)
-            # inst = res[rand]
-            #
-            # if inst['o'] in checked_inst:
-            #     offset += limit
-            #     continue
-            for inst in res:
-                for c in rdfmt2:
-                    if c['rootType'] in links_found:
-                        continue
-                    exists = link_exist(inst['o'], c['rootType'], endpoint2)
-                    checked_inst.append(inst['o'])
-                    if exists:
-                        reslist.append(c['rootType'])
-                        links_found.append(c['rootType'])
-                        print(rootType, ',', pred, '->', c['rootType'])
+            for c in rdfmt2:
+                if c['rootType'] in links_found:
+                    continue
+                exists = link_exist(res, c['rootType'], endpoint2)
+                if exists:
+                    reslist.append(c['rootType'])
+                    links_found.append(c['rootType'])
+                    print(rootType, ',', pred, '->', c['rootType'])
             reslist = list(set(reslist))
-
+        if len(links_found) == len(rdfmt2):
+            break
         if card < limit:
             break
 
         offset += limit
 
+    # print(reslist)
+    # print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     return reslist
 
 
-def link_exist(s, c, endpoint):
-
-    query = "ASK {<" + s + '>  a  <' + c + '> } '
+def link_exist(insts, c, endpoint):
+    inst = [i['o'] if ' ' not in i['o'] else i['o'].replace(' ', '_') for i in insts]
+    oinstances = ["?s = <" + i + "> " for i in inst]
+    query = 'ASK {?s  a  <' + c + '> FILTER (' + " || ".join(oinstances) + ')}'
     referer = endpoint
 
     res, card = contactRDFSource(query, referer)
     if res is None:
-        print('bad request on, ', s, c)
+        print('bad request on, ', query)
     if card > 0:
         if res:
-            print("ASK result", res, endpoint)
+            print("ASK result", res, c, endpoint)
         return res
 
     return False
@@ -600,10 +602,37 @@ def usage():
     print(usage_str.format(program=sys.argv[0]),)
 
 
+def mergeMTs(rdfmt, rootType, dsrdfmts):
+    otherrdfmt = dsrdfmts[rootType]
+
+    dss = {d['url']: d for d in otherrdfmt['wrappers']}
+
+    if rdfmt['wrappers'][0]['url'] not in dss:
+        otherrdfmt['wrappers'].extend(rdfmt['wrappers'])
+    else:
+        pps = rdfmt['wrappers'][0]['predicates']
+        dss[rdfmt['wrappers'][0]['url']]['predicates'].extend(pps)
+        dss[rdfmt['wrappers'][0]['url']]['predicates'] = list(set(dss[rdfmt['wrappers'][0]['url']]['predicates']))
+        otherrdfmt['wrappers'] = list(dss.values())
+
+    otherpreds = {p['predicate']: p for p in otherrdfmt['predicates']}
+    thispreds = {p['predicate']: p for p in rdfmt['predicates']}
+    sameps = set(otherpreds.keys()).intersection(thispreds.keys())
+    if len(sameps) > 0:
+        for p in sameps:
+            if len(thispreds[p]['range']) > 0:
+                otherpreds[p]['range'].extend(thispreds[p]['range'])
+                otherpreds[p]['range'] = list(set(otherpreds[p]['range']))
+    preds = [otherpreds[p] for p in otherpreds]
+    otherrdfmt['predicates'] = preds
+
+    otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
+
+
 if __name__ == "__main__":
     endpointsfile, output = get_options(sys.argv[1:])
     # endpointsfile = 'endpoints.txt'
-    # output = 'tibfedmols.json'
+    # output = 'lslodfedmols.json'
     with open(endpointsfile, 'r') as f:
         endpoints = f.readlines()
         if len(endpoints) == 0:
@@ -616,15 +645,58 @@ if __name__ == "__main__":
             sys.exit(1)
     dsrdfmts = {}
     sparqlendps = {}
+    eoffs = {}
+    epros = []
     for url in endpoints:
-        rdfmts = get_typed_concepts(url)
-        sparqlendps[url] = rdfmts.copy()
+        # rdfmts = get_typed_concepts(url)
+        # sparqlendps[url] = rdfmts.copy()
+        tq = Queue()
+        eoffs[url] = tq
+        p1 = Process(target=get_typed_concepts, args=(url, tq, ))
+        epros.append(p1)
+        p1.start()
 
+    while len(eoffs) > 0:
+        for url in eoffs:
+            q = eoffs[url]
+            rdfmts = q.get()
+            sparqlendps[url] = rdfmts
+            del eoffs[url]
+            break
+    for p in epros:
+        if p.is_alive():
+            p.terminate()
+
+    eofflags = []
+    epros = []
     for e1 in sparqlendps:
         for e2 in sparqlendps:
             if e1 == e2:
                 continue
-            get_links(e1, sparqlendps[e1], e2, sparqlendps[e2])
+            q = Queue()
+            eofflags.append(q)
+            print("Finding inter-links between:", e1, ' and ', e2, ' .... ')
+            print("==============================//=========//===============================")
+            p = Process(target=get_links, args=(e1, sparqlendps[e1], e2, sparqlendps[e2], q,))
+            epros.append(p)
+            p.start()
+            # get_links(e1, sparqlendps[e1], e2, sparqlendps[e2])
+
+    while len(eofflags) > 0:
+        for q in eofflags:
+            rdfmts = q.get()
+            for rdfmt in rdfmts:
+                rootType = rdfmt['rootType']
+                if rootType not in dsrdfmts:
+                    dsrdfmts[rootType] = rdfmt
+                else:
+                    mergeMTs(rdfmt, rootType, dsrdfmts)
+            eofflags.remove(q)
+            break
+
+    for p in epros:
+        if p.is_alive():
+            p.terminate()
 
     for e in sparqlendps:
         rdfmts = sparqlendps[e]
@@ -633,31 +705,11 @@ if __name__ == "__main__":
             if rootType not in dsrdfmts:
                 dsrdfmts[rootType] = rdfmt
             else:
-                otherrdfmt = dsrdfmts[rootType]
-
-                dss = {d['url']: d for d in otherrdfmt['wrappers']}
-
-                if rdfmt['wrappers'][0]['url'] not in dss:
-                    otherrdfmt['wrappers'].extend(rdfmt['wrappers'])
-                else:
-                    pps = rdfmt['wrappers'][0]['predicates']
-                    dss[rdfmt['wrappers'][0]['url']]['predicates'].extend(pps)
-                    dss[rdfmt['wrappers'][0]['url']]['predicates'] = list(set(dss[rdfmt['wrappers'][0]['url']]['predicates']))
-                    otherrdfmt['wrappers'] = list(dss.values())
-
-                otherpreds = {p['predicate']: p for p in otherrdfmt['predicates']}
-                thispreds = {p['predicate']: p for p in rdfmt['predicates']}
-                sameps = set(otherpreds.keys()).intersection(thispreds.keys())
-                if len(sameps) > 0:
-                    for p in sameps:
-                        if len(thispreds[p]['range']) > 0:
-                            otherpreds[p]['range'].extend(thispreds[p]['range'])
-                            otherpreds[p]['range'] = list(set(otherpreds[p]['range']))
-                preds = [otherpreds[p] for p in otherpreds]
-                otherrdfmt['predicates'] = preds
-
-                otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
+                mergeMTs(rdfmt, rootType, dsrdfmts)
 
     templates = list(dsrdfmts.values())
     json.dump(templates, open(output, 'w+'))
+    pprint(templates)
     logger.info('-----DONE!-----')
+    import os
+    os._exit(0)
