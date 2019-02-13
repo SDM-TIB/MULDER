@@ -166,10 +166,12 @@ class MediatorDecomposer(object):
         conn = self.getStarsConnections(stars)
         selectedmolecules = {}
         varpreds = {}
+        starpreds = {}
 
         for s in stars.copy():
             ltr = stars[s]
             preds = [utils.getUri(tr.predicate, self.prefixes)[1:-1] for tr in ltr if tr.predicate.constant]
+            starpreds[s] = preds
             typemols = self.checkRDFTypeStatemnt(ltr)
             if len(typemols) > 0:
                 selectedmolecules[s] = typemols
@@ -215,8 +217,98 @@ class MediatorDecomposer(object):
         qpl1 = []
         for s in res:
             if len(res[s]) == 1:
-                endpoint = self.config.metadata[res[s][0]]['wrappers'][0]['url']
-                qpl0.append(Service("<" + endpoint + ">", list(set(stars[s]))))
+                if len(self.config.metadata[res[s][0]]['wrappers']) == 1:
+                    endpoint = self.config.metadata[res[s][0]]['wrappers'][0]['url']
+                    qpl0.append(Service("<" + endpoint + ">", list(set(stars[s]))))
+                else:
+                    sources =[w['url'] for w in self.config.metadata[res[s][0]]['wrappers']
+                              if len(starpreds[s]) == len(list(set(starpreds[s]).intersection(set(w['predicates']))))]
+                    # joins = [JoinBlock([Service("<" + url + ">", list(set(stars[s])))]) for url in sources]
+                    # qpl1.append([UnionBlock([UnionBlock(joins)])])
+                    if len(sources) == 1:
+                        endpoint = sources[0]
+                        qpl0.append(Service("<" + endpoint + ">", list(set(stars[s]))))
+                    elif len(sources) > 1:
+                        elems = [JoinBlock([Service("<" + ep + ">", list(set(stars[s])))]) for ep in sources]
+                        ub = UnionBlock(elems)
+                        qpl1.append(ub)
+                    else:
+                        # split and join
+                        wpreds = {}
+
+                        ptrs = {utils.getUri(tr.predicate, self.prefixes)[ 1:-1]: tr for tr in stars[s] if tr.predicate.constant}
+                        for w in self.config.metadata[res[s][0]]['wrappers']:
+                            wps = [p for p in w['predicates'] if p in starpreds[s]]
+                            wpreds[w['url']] = wps
+
+                        inall = []
+                        difs = {}
+                        for e in wpreds:
+                            if len(inall) == 0:
+                                inall = wpreds[e]
+                            else:
+                                inall = list(set(inall).intersection(wpreds[e]))
+
+                            if e not in difs:
+                                difs[e] = wpreds[e]
+                            for d in difs:
+                                if e == d:
+                                    continue
+                                dd = list(set(difs[d]).difference(wpreds[e]))
+                                if len(dd) > 0:
+                                    difs[d] = dd
+
+                                dd = list(set(difs[e]).difference(wpreds[d]))
+                                if len(dd) > 0:
+                                    difs[e] = dd
+
+                        oneone = {}
+                        for e1 in wpreds:
+                            for e2 in wpreds:
+                                if e1 == e2 or e2+'|-|'+ e1 in oneone:
+                                    continue
+                                pp = set(wpreds[e1]).intersection(wpreds[e2])
+                                pp = list(set(pp).difference(inall))
+                                if len(pp) > 0:
+                                    oneone[e1+'|-|'+e2] = pp
+                        onv = []
+                        [onv.extend(d) for d in list(oneone.values())]
+                        difv = []
+                        [difv.extend(d) for d in list(difs.values())]
+                        for o in onv:
+                            if o in difv:
+                                toremov = []
+                                for d in difs:
+                                    if o in difs[d]:
+                                        difs[d].remove(o)
+                                        difv.remove(o)
+                                    if len(difs[d]) == 0:
+                                        toremov.append(d)
+                                for d in toremov:
+                                    del difs[d]
+
+                        ddd = onv + difv
+                        if len(set(inall + ddd)) == len(starpreds[s]):
+                            if len(inall) > 0:
+                                trps = [ptrs[p] for p in inall]
+                                elems = [JoinBlock([Service("<" + ep + ">", list(set(trps)))]) for ep in list(wpreds.keys())]
+                                ub = UnionBlock(elems)
+                                qpl1.append(ub)
+                            if len(oneone) > 0:
+                                for ee in oneone:
+                                    e1, e2 = ee.split("|-|")
+                                    pp = oneone[ee]
+                                    trps = [ptrs[p] for p in pp]
+                                    elems = [JoinBlock([Service("<" + e1 + ">", list(set(trps)))]),
+                                             JoinBlock([Service("<" + e2 + ">", list(set(trps)))])]
+                                    ub = UnionBlock(elems)
+                                    qpl1.append(ub)
+                            if len(difs) > 0:
+                                for d in difs:
+                                    trps = [ptrs[p] for p in difs[d]]
+                                    qpl0.append(Service("<" + d + ">", list(set(trps))))
+                        else:
+                            return []
             else:
                 # preds = [utils.getUri(tr.predicate, self.prefixes)[1:-1] for tr in stars[s] if tr.predicate.constant]
                 # mulres = self.decompose_multimolecule(res[s], stars[s], preds)

@@ -113,12 +113,14 @@ def contactRDFSource(query, endpoint, format="application/sparql-results+json"):
                     return res['boolean'], 1
 
         else:
-            # print("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
-            logger.info("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
+            print("Endpoint->", endpoint, resp.reason, resp.status_code, resp.text, query)
+            logger.info("Endpoint->" + endpoint + str(resp.reason) + str(resp.status_code) + str(resp.text) + query)
 
     except Exception as e:
         # print("Exception during query execution to", endpoint, ': ', e)
         logger.info("Exception during query execution to", endpoint, ': ', e)
+    finally:
+        pass
 
     return None, -2
 
