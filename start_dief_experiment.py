@@ -31,7 +31,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults, result_folder):
+def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, withoutCounts, printResults, result_folder, joinlocally=False):
 
     '''if isEndpoint:
         contact = contactSource
@@ -74,7 +74,7 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
 
     time1 = time()
 
-    mdq = MediatorDecomposer(query, config, tempType)
+    mdq = MediatorDecomposer(query, config, tempType, joinstarslocally=joinlocally)
     new_query = mdq.decompose()
 
     dt = time() - time1
@@ -271,7 +271,7 @@ def usage():
                  +"\n where \n<isEndpoint> - a boolean value "
                  +"\n<result_folder> - an existing folder to store results.csv and traces.csv"
                   "\n")
-    print (usage_str.format(program=sys.argv[0]),)
+    print(usage_str.format(program=sys.argv[0]),)
 
 
 def main(argv):
