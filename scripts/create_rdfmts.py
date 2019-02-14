@@ -350,7 +350,6 @@ def get_predicates(referer, t, limit=-1):
         limit = 50
         offset = 0
         numrequ = 0
-        print(t)
         while True:
             query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
             res, card = contactRDFSource(query_copy, referer)
@@ -544,6 +543,7 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
     # print("Checking external links: ", endpoint1, rootType, pred, ' in ', endpoint2)
     while True:
         query_copy = query + " LIMIT " + str(limit) + " OFFSET " + str(offset)
+        res = []
         res, card = contactRDFSource(query_copy, referer)
         numrequ += 1
         if card == -2:
@@ -557,11 +557,22 @@ def get_external_links(endpoint1, rootType, pred, endpoint2, rdfmt2):
             for c in rdfmt2:
                 if c['rootType'] in links_found:
                     continue
-                exists = link_exist(res, c['rootType'], endpoint2)
-                if exists:
-                    reslist.append(c['rootType'])
-                    links_found.append(c['rootType'])
-                    print(rootType, ',', pred, '->', c['rootType'])
+                if len(res) > 45:
+                    for i in range(0, len(res), 45):
+                        if i + 45 < len(res):
+                            exists = link_exist(res[i:45], c['rootType'], endpoint2)
+                        else:
+                            exists = link_exist(res[i:], c['rootType'], endpoint2)
+                        if exists:
+                            reslist.append(c['rootType'])
+                            links_found.append(c['rootType'])
+                            print(rootType, ',', pred, '->', c['rootType'])
+                else:
+                    exists = link_exist(res, c['rootType'], endpoint2)
+                    if exists:
+                        reslist.append(c['rootType'])
+                        links_found.append(c['rootType'])
+                        print(rootType, ',', pred, '->', c['rootType'])
             reslist = list(set(reslist))
         if len(links_found) == len(rdfmt2):
             break
@@ -633,8 +644,8 @@ def mergeMTs(rdfmt, rootType, dsrdfmts):
 
 if __name__ == "__main__":
     endpointsfile, output = get_options(sys.argv[1:])
-    # endpointsfile = 'endpoints.txt'
-    # output = 'lslodfedmols.json'
+    # endpointsfile = 'lslodsingle_db_endp.txt'
+    #output = 'lslodsingle_dbp_fedmols.json'
     with open(endpointsfile, 'r') as f:
         endpoints = f.readlines()
         if len(endpoints) == 0:
