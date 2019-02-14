@@ -2,17 +2,14 @@
 
 import getopt, sys
 from pprint import pprint
-import rdflib
-from enum import Enum
 import json
 import logging
 import time
 import urllib.parse as urlparse
-import http.client as htclient
 from http import HTTPStatus
 import requests
 from multiprocessing import Queue, Process
-from multiprocessing.queues import Empty
+
 
 xsd = "http://www.w3.org/2001/XMLSchema#"
 owl = ""
@@ -629,7 +626,8 @@ def mergeMTs(rdfmt, rootType, dsrdfmts):
                 otherpreds[p]['range'] = list(set(otherpreds[p]['range']))
     preds = [otherpreds[p] for p in otherpreds]
     otherrdfmt['predicates'] = preds
-
+    newpreds = set(list(thispreds.keys())).difference(list(otherpreds.keys()))
+    otherrdfmt['predicates'].extend([thispreds[p] for p in newpreds])
     otherrdfmt['linkedTo'] = list(set(rdfmt['linkedTo'] + otherrdfmt['linkedTo']))
 
 
