@@ -598,6 +598,8 @@ class MediatorDecomposer(object):
                     for p in preds:
                         if p in w['predicates']:
                             exitsingpreds.append(predtrips[p])
+                    if len(exitsingpreds) == 0:
+                        continue
                     urlmoleculemap[w['url']] = x
                     if w['url'] not in sourceindex:
                         sourceindex[w['url']] = exitsingpreds
@@ -610,6 +612,9 @@ class MediatorDecomposer(object):
                 for p in preds:
                     if p in w['predicates']:
                         exitsingpreds.append(predtrips[p])
+                if len(exitsingpreds) == 0:
+                    continue
+
                 urlmoleculemap[w['url']] = x
                 if w['url'] not in sourceindex:
                     sourceindex[w['url']] = exitsingpreds
