@@ -9,11 +9,11 @@ PREFIX dailymed: <http://www4.wiwiss.fu-berlin.de/dailymed/resource/dailymed/>
 PREFIX sider: <http://www4.wiwiss.fu-berlin.de/sider/resource/sider/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX linkedct: <http://data.linkedct.org/vocab/resource/>
+PREFIX linkedct: <http://data.linkedct.org/resource/linkedct/>
 SELECT DISTINCT *
 WHERE {
 ?intervention a linkedct:intervention.
-?intervention linkedct:intervention_intervention_name ?intervention_name.
+?intervention linkedct:intervention_name ?intervention_name.
 ?intervention rdfs:seeAlso ?dailymedDrug .
 ?dailymedDrug dailymed:dosage ?dosage.
 ?dailymedDrug   dailymed:description ?description.

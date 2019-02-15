@@ -161,12 +161,183 @@ class MediatorDecomposer(object):
 
         return results
 
+    def decomposeSplitedStar(self, star, splitstars, preds):
+
+        qpl0 = []
+        qpl1 = []
+        starpreds = {utils.getUri(tr.predicate, self.prefixes)[1:-1]: tr for tr in star if tr.predicate.constant}
+        sourcesIndex = {}
+        for m in splitstars:
+            wrappers = self.config.metadata[m]['wrappers']
+            for w in wrappers:
+                sourcesIndex.setdefault(w['url'], []).append(m)
+        samesource = {m: sourcesIndex[m] for m in sourcesIndex if len(sourcesIndex[m]) == len(splitstars)}
+        if len(samesource) > 0:
+            for url in sourcesIndex:
+                qpl0.append(Service("<" + url + ">", list(set(star))))
+                break
+        else:
+            inall = []
+            i = 0
+            difs = {}
+            for m in splitstars:
+                if i == 0:
+                    inall = splitstars[m]
+                    i += 1
+                    continue
+                inall = list(set(inall).intersection(splitstars[m]))
+                i += 1
+
+                if m not in difs:
+                    difs[m] = splitstars[m]
+                for d in difs:
+                    if m == d:
+                        continue
+                    dd = list(set(difs[d]).difference(splitstars[m]))
+                    if len(dd) > 0:
+                        difs[d] = dd
+
+                    dd = list(set(difs[m]).difference(splitstars[d]))
+                    if len(dd) > 0:
+                        difs[m] = dd
+
+            oneone = {}
+            for e1 in splitstars:
+                for e2 in splitstars:
+                    if e1 == e2 or e2 + '|-|' + e1 in oneone:
+                        continue
+                    pp = set(splitstars[e1]).intersection(splitstars[e2])
+                    pp = list(set(pp).difference(inall))
+                    if len(pp) > 0:
+                        oneone[e1 + '|-|' + e2] = pp
+            onv = []
+            [onv.extend(d) for d in list(oneone.values())]
+            difv = []
+            [difv.extend(d) for d in list(difs.values())]
+            for o in onv:
+                if o in difv:
+                    toremov = []
+                    for d in difs:
+                        if o in difs[d]:
+                            difs[d].remove(o)
+                            difv.remove(o)
+                        if len(difs[d]) == 0:
+                            toremov.append(d)
+                    for d in toremov:
+                        del difs[d]
+
+            ddd = onv + difv
+            if len(set(inall + ddd)) == len(starpreds):
+                if len(inall) > 0:
+                    if len(inall) > 0:
+                        triples = [starpreds[p] for p in inall]
+                        md = self.metawrapperdecomposer(list(splitstars.keys()), triples)
+                        if isinstance(md, Service):
+                            qpl0.append(md)
+                        else:
+                            for m in md:
+                                if isinstance(m, Service):
+                                    qpl0.append(m)
+                                else:
+                                    qpl1.append(m)
+                    #
+                    # trps = [ptrs[p] for p in inall]
+                    # elems = [JoinBlock([Service("<" + ep + ">", list(set(trps)))]) for ep in list(wpreds.keys())]
+                    # ub = UnionBlock(elems)
+                    # qpl1.append(ub)
+                if len(oneone) > 0:
+                    for ee in oneone:
+                        e1, e2 = ee.split("|-|")
+                        pp = oneone[ee]
+                        # trps = [ptrs[p] for p in pp]
+                        triples = [starpreds[p] for p in pp]
+                        e1wrappers = self.config.metadata[e1]['wrappers']
+                        e2wrappers = self.config.metadata[e2]['wrappers']
+                        if len(e1wrappers) == 1:
+                            e1serv = JoinBlock([Service("<" + e1wrappers[0]['url'] + ">", list(set(triples)))])
+                        else:
+                            elems = [JoinBlock([Service("<" + ep['url'] + ">", list(set(triples)))]) for ep in e1wrappers]
+                            e1serv = UnionBlock(elems)
+                        if len(e2wrappers) == 1:
+                            e2serv = JoinBlock([Service("<" + e2wrappers[0]['url'] + ">", list(set(triples)))])
+                        else:
+                            elems = [JoinBlock([Service("<" + ep['url'] + ">", list(set(triples)))]) for ep in
+                                     e2wrappers]
+                            e2serv = UnionBlock(elems)
+
+                        elems = [e1serv, e2serv]
+                        ub = UnionBlock(elems)
+                        qpl1.append(ub)
+                if len(difs) > 0:
+                    for d in difs:
+                        # trps = [ptrs[p] for p in difs[d]]
+                        e1wrappers = self.config.metadata[d]['wrappers']
+                        triples = [starpreds[p] for p in difs[d]]
+                        if len(e1wrappers) == 1:
+                            e1serv = Service("<" + e1wrappers[0]['url'] + ">", list(set(triples)))
+                        else:
+                            elems = [JoinBlock([Service("<" + ep['url'] + ">", list(set(triples)))]) for ep in e1wrappers]
+                            e1serv = UnionBlock(elems)
+
+                        qpl0.append(e1serv)
+            else:
+                return []
+
+        if qpl0 and not self.joinlocally:
+            joins = {}
+            g = 0
+            merged = []
+            for i in range(len(qpl0)):
+                if i + 1 < len(qpl0):
+                    for j in range(i + 1, len(qpl0)):
+                        s = qpl0[i]
+                        k = qpl0[j]
+                        if s.endpoint == k.endpoint:
+                            if self.shareAtLeastOneVar(k.triples, s.triples):
+                                if s.endpoint in joins:
+                                    joins[s.endpoint].extend(s.triples + k.triples)
+                                else:
+                                    joins[s.endpoint] = s.triples + k.triples
+                                merged.append(s)
+                                merged.append(k)
+                                joins[s.endpoint] = list(set(joins[s.endpoint]))
+
+            [qpl0.remove(r) for r in set(merged)]
+            for s in qpl0:
+                if s.endpoint in joins:
+                    if self.shareAtLeastOneVar(joins[s.endpoint], s.triples):
+                        joins[s.endpoint].extend(s.triples)
+                    else:
+
+                        joins[s.endpoint + "|" + str(g)] = s.triples
+                        g += 1
+                else:
+                    joins[s.endpoint] = s.triples
+
+                joins[s.endpoint] = list(set(joins[s.endpoint]))
+
+            qpl0 = []
+            for e in joins:
+                endp = e.split('|')[0]
+
+                qpl0.append(Service('<' + endp + '>', joins[e]))
+
+        if qpl0 and qpl1:
+            qpl1.insert(0, qpl0)
+            return qpl1
+        elif qpl0 and not qpl1:
+            return qpl0
+        else:
+            return qpl1
+
     def decomposeBGP(self, tl):
         stars = self.getQueryStar(tl)
-        conn = self.getStarsConnections(stars)
+
         selectedmolecules = {}
         varpreds = {}
         starpreds = {}
+        conn = self.getStarsConnections(stars)
+        splitedstars = {}
 
         for s in stars.copy():
             ltr = stars[s]
@@ -202,8 +373,16 @@ class MediatorDecomposer(object):
                 else:
                     selectedmolecules[s] = mols
             else:
-                print ("cannot find any matching molecules for:", tl)
-                return []
+                splitstars = self.config.find_preds_per_mt(preds)
+                if len(splitstars) == 0:
+                    print("cannot find any matching molecules for:", tl)
+                    return []
+                else:
+                    splitedstars[s] = [stars[s], splitstars, preds]
+                    for m in list(splitstars.keys()):
+                        selectedmolecules[str(s+'_'+m)] = [m]
+                    #return self.decomposeSplitedStar(stars[s], splitstars, preds)
+
         if len(varpreds) > 0:
             mols = [m for m in self.config.metadata]
             for s in varpreds:
@@ -211,6 +390,18 @@ class MediatorDecomposer(object):
 
         molConn = self.getMTsConnection(selectedmolecules)
         results = []
+        if len(splitedstars) > 0:
+            for s in splitedstars:
+                newstarpreds = {utils.getUri(tr.predicate, self.prefixes)[1:-1]: tr for tr in stars[s] if
+                             tr.predicate.constant}
+
+                for m in splitedstars[s][1]:
+                    stars[str(s+'_'+m)] = [newstarpreds[p] for p in splitedstars[s][1][m]]
+                    starpreds[str(s+'_'+m)] = splitedstars[s][1][m]
+                del stars[s]
+                del starpreds[s]
+
+        conn = self.getStarsConnections(stars)
         res = self.pruneMTs(conn, molConn, selectedmolecules, stars)
         # print(res)
         qpl0 = []
@@ -460,10 +651,10 @@ class MediatorDecomposer(object):
             #     joins = []
         else:
             #TODO: check other decompositions to make a true union
-            joins.append([JoinBlock([Service("<" + url + ">", triplepatterns)]) for url in sourceindex])
+            joins.extend([JoinBlock([Service("<" + url + ">", triplepatterns)]) for url in sourceindex])
 
         if len(joins) > 0:
-            servs.append(UnionBlock([UnionBlock(joins)]))
+            servs.append(UnionBlock(joins))
         return servs
 
     def getMTsConnection(self, selectedmolecules):

@@ -51,6 +51,21 @@ class Config(object):
         mols = list(res[0])
         return mols
 
+    def find_preds_per_mt(self, preds):
+        res = {}
+        for p in preds:
+            if p in self.predidx:
+                for m in self.predidx[p]:
+                    res.setdefault(m, []).append(p)
+
+        respreds = []
+        for m in res:
+            respreds.extend(res[m])
+        if len(set(list(respreds))) != len(preds):
+            return {}
+
+        return res
+
     def findbypred(self, pred):
         mols = []
         for m in self.metadata:
