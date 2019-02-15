@@ -12,7 +12,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX chebi: <http://bio2rdf.org/ns/chebi#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX medicare: <http://data.medicare.gov/resource/>
+PREFIX medicare: <http://www4.wiwiss.fu-berlin.de/medicare/resource/medicare/>
 SELECT *
 WHERE {
 	?medicareDrug a medicare:drugs .
