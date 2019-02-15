@@ -67,7 +67,14 @@ class MediatorDecomposer(object):
             elif isinstance(bgp, Filter):
                 fl.append(bgp)
             elif isinstance(bgp, Optional):
-                sl.append(Optional(self.decomposeUnionBlock(bgp.bgg)))
+                ubb = self.decomposeUnionBlock(bgp.bgg)
+                skipp = False
+                for ot in ubb.triples:
+                    if isinstance(ot, JoinBlock) and len(ot.triples) > 1 and len(ot.filters) > 0:
+                        skipp = True
+                        break
+                if not skipp:
+                    sl.append(Optional(ubb))
             elif isinstance(bgp, UnionBlock):
                 pub = self.decomposeUnionBlock(bgp)
                 if pub:
