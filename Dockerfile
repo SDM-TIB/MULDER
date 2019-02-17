@@ -21,7 +21,7 @@ WORKDIR /data
 
 EXPOSE 5000
 
-CMD ["python3.5", "/MULDER/EndpointService.py", "-c", "/data/config.json"]
+#CMD ["python3.5", "/MULDER/EndpointService.py", "-c", "/data/config.json"]
 # CMD ["python3.5", "/MULDER/rabbitmq_receiver.py"]
-
+CMD ["tail", "-f", "/dev/null"]
 # CMD ["/bin/bash", "/MULDER/start-services.sh"]
