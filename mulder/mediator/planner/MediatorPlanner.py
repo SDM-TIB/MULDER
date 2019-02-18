@@ -838,7 +838,7 @@ def contactSourceAux(referer, server, path, port, query, queue):
         with urllib.request.urlopen(req) as response:
             resp = response.read()
             resp = resp.decode()
-            res = resp.text.replace("false", "False")
+            res = resp.replace("false", "False")
             res = res.replace("true", "True")
             res = eval(res)
             reslist = 0
