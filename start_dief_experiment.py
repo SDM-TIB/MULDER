@@ -55,9 +55,9 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
     global resulttime
     global resulttrace
 
-    resulttime = open(result_folder+"/results.csv", 'aw+')
+    resulttime = open(result_folder+"/results.csv", 'a+')
     # resulttime.write("qname,decompositionTime,planningTime,firstResult,overallTime,moreResults,cardinality")
-    resulttrace = open(result_folder + "/traces.csv", 'aw+')
+    resulttrace = open(result_folder + "/traces.csv", 'a+')
     # resulttrace.write("qname,cardinality,time")
 
     c1 = 0
