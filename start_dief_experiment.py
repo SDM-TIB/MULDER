@@ -55,9 +55,9 @@ def runQuery(queryfile, configfile, tempType, isEndpoint, res, qplan, adaptive, 
     global resulttime
     global resulttrace
 
-    resulttime = open(result_folder+"/results.csv", 'aw+')
+    resulttime = open(result_folder+"/results.csv", 'a+')
     # resulttime.write("qname,decompositionTime,planningTime,firstResult,overallTime,moreResults,cardinality")
-    resulttrace = open(result_folder + "/traces.csv", 'aw+')
+    resulttrace = open(result_folder + "/traces.csv", 'a+')
     # resulttrace.write("qname,cardinality,time")
 
     c1 = 0
@@ -228,7 +228,7 @@ def onSignal2(s, stackframe):
 
 def get_options(argv):
     try:
-        opts, args = getopt.getopt(argv, "h:c:q:t:s:r:")
+        opts, args = getopt.getopt(argv, "h:c:q:t:s:r:j:p:")
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -242,6 +242,8 @@ def get_options(argv):
     adaptive = True
     withoutCounts = False
     printResults = False
+    planonly = False
+    joinlocally = False
     result_folder = './'
     for opt, arg in opts:
         if opt == "-h":
@@ -257,12 +259,16 @@ def get_options(argv):
             isEndpoint = arg == "True"
         elif opt == '-r':
             result_folder = arg
+        elif opt == '-p':
+            planonly = eval(arg)
+        elif opt == '-j':
+            joinlocally = eval(arg)
 
     if not configfile or not queryfile:
         usage()
         sys.exit(1)
 
-    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults, result_folder)
+    return (configfile, queryfile, tempType, isEndpoint, plan, adaptive, withoutCounts, printResults, result_folder, joinlocally)
 
 
 def usage():
@@ -277,9 +283,9 @@ def usage():
 def main(argv):
     res = Queue()
     time1 = time()
-    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults, result_folder) = get_options(argv[1:])
+    (configfile, queryfile, buffersize, isEndpoint, plan, adaptive, withoutCounts, printResults, result_folder, joinlocally) = get_options(argv[1:])
     try:
-        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, result_folder)
+        runQuery(queryfile, configfile, buffersize, isEndpoint, res, plan, adaptive, withoutCounts, printResults, result_folder, joinlocally)
     except Exception as ex:
         print (ex)
 
