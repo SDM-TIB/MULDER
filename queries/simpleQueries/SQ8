@@ -12,6 +12,6 @@ PREFIX owl: <http://www.w3.org/2002/07/owl#>
 SELECT ?drug ?disease ?label
 WHERE {
 ?disease diseasome:name ?diseasomename .
-?disease drugbank:possibleDiseaseTarget ?drug .
+?drug drugbank:possibleDiseaseTarget ?disease .
 ?drug rdfs:label ?label .
 }

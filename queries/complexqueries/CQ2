@@ -20,7 +20,7 @@ WHERE {
 	?chebiDrug purl:title ?drugBankName .
 	?chebiDrug chebi:iupacName ?chebiIupacName .
 	OPTIONAL {
-		?drug drugbank:inchiIdentifier ?drugbakInchi .
+		?drug drugbank:inchiIdentifier ?drugbankInchi .
 		?chebiDrug bio2RDF:inchi ?chebiInchi .
 		FILTER (?drugbankInchi = ?cheniInchi )
 	}
