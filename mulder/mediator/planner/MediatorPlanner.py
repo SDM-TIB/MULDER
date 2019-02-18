@@ -675,7 +675,7 @@ class IndependentOperator(object):
         self.tree = tree
         self.query_str = sq
         self.vars = vs
-        self.buffersize = 16384
+        self.buffersize = 163840
         self.config = config
         self.cardinality = None
         self.joinCardinality = []
@@ -749,25 +749,25 @@ class IndependentOperator(object):
 
         # Evaluate the independent operator.
 
-        self.q = Queue()
+        #self.q = Queue()
 
-        p = Process(target=self.contact, args=(self.server, self.query_str, self.q, self.config, self.tree.service.limit,))
+        p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit,))
         p.start()
         # processqueue.put(p.pid)
 
-        i = 0
-        while True:
-            # Get the next item in queue.
-            res = self.q.get(True)
-            # Put the result into the output queue.
-            #print res
-            i += 1
-            outputqueue.put(res)
-            # Check if there's no more data.
-            if res == "EOF":
-                break
-
-        p.terminate()
+        # i = 0
+        # while True:
+        #     # Get the next item in queue.
+        #     res = self.q.get(True)
+        #     # Put the result into the output queue.
+        #     #print res
+        #     i += 1
+        #     outputqueue.put(res)
+        #     # Check if there's no more data.
+        #     if res == "EOF":
+        #         break
+        #
+        # p.terminate()
 
 
 def contactSource(molecule, query, queue, config, limit=-1):
