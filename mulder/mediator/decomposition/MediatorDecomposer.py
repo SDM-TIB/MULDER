@@ -491,17 +491,26 @@ class MediatorDecomposer(object):
         joins = []
         servs = []
         if intersects and len(intersects) > 0:
-            [sourceindex[url].remove(e) for e in intersects for url in sourceindex]
-            ignore = []
-            for url in sourceindex:
-                if len(sourceindex[url]) == len(triplepatterns):
-                    servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
-                    ignore.append(url)
+            singlesource = {url: sourceindex[url] for url in sourceindex if len(sourceindex[url]) == len(triplepatterns)}
+            if len(singlesource) > 0:
+                if len(singlesource) == 1:
+                    for url in singlesource:
+                        servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
                 else:
-                    joins.append(JoinBlock([Service("<" + url + ">", list(intersects))]))
-            for url in sourceindex:
-                if len(sourceindex[url]) > 0 and url not in ignore:
-                    servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
+                    for url in singlesource:
+                        joins.append(JoinBlock([Service("<" + url + ">", list(set(sourceindex[url])))]))
+            else:
+                [sourceindex[url].remove(e) for e in intersects for url in sourceindex]
+                ignore = []
+                for url in sourceindex:
+                    if len(sourceindex[url]) == len(triplepatterns):
+                        servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
+                        ignore.append(url)
+                    else:
+                        joins.append(JoinBlock([Service("<" + url + ">", list(intersects))]))
+                for url in sourceindex:
+                    if len(sourceindex[url]) > 0 and url not in ignore:
+                        servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
             # if len(servs) == len(sourceindex):
             #     joins = servs
             #     servs = []
