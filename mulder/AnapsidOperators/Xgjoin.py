@@ -30,7 +30,7 @@ class Xgjoin(Join):
         self.sourcesBlocked     = False
 
         # Main memory settings
-        self.memorySize   = 1000000000        # Represents the main memory size (# tuples).OLD:Represents the main memory size (in KB).
+        self.memorySize   = 100000000        # Represents the main memory size (# tuples).OLD:Represents the main memory size (in KB).
         self.fileDescriptor_left = {}
         self.fileDescriptor_right = {}
         self.memory_left  = 0

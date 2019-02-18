@@ -594,7 +594,7 @@ class TreePlan(object):
 
     def getCardinality(self):
 
-        if self.cardinality == None:
+        if self.cardinality is None:
             self.cardinality = self.operator.getCardinality(self.left, self.right)
         return self.cardinality
 
@@ -604,7 +604,7 @@ class TreePlan(object):
             if v == vars:
                 c = c2
                 break
-        if c == None:
+        if c is None:
             c = self.operator.getJoinCardinality(self.left, self.right, vars)
             self.joinCardinality.append((vars, c))
         return c
@@ -639,7 +639,7 @@ class TreePlan(object):
                 return
 
             # Check the right node to determine if evaluate it or not.
-            if (self.right and ((self.right.__class__.__name__ == "IndependentOperator") or (self.right.__class__.__name__ == "TreePlan"))):
+            if self.right and ((self.right.__class__.__name__ == "IndependentOperator") or (self.right.__class__.__name__ == "TreePlan")):
                 p2 = Process(target=self.right.execute, args=(qright, processqueue, ))
                 p2.start()
                 processqueue.put(p2.pid)
@@ -692,7 +692,7 @@ class IndependentOperator(object):
         return IndependentOperator(self.query, new_tree, self.contact, self.config)
 
     def getCardinality(self):
-        if self.cardinality == None:
+        if self.cardinality is None:
             self.cardinality = self.askCount(self.query, self.tree, set(), self.contact)
         return self.cardinality
 
@@ -717,7 +717,7 @@ class IndependentOperator(object):
             if v == vars:
                 c = c2
                 break
-        if c == None:
+        if c is None:
             if len(vars) == 0:
                 c = self.getCardinality()
             else:
@@ -747,8 +747,8 @@ class IndependentOperator(object):
             self.tree.service.limit = 10000 #TODO: Fixed value, this can be learnt in the future
 
         # Evaluate the independent operator.
-        self.q = None
-        self.q = Queue()
+        # self.q = None
+        # self.q = Queue()
 
         p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit,))
         p.start()
@@ -834,7 +834,6 @@ def contactSourceAux(referer, server, path, port, query, queue):
     js = "application/sparql-results+json"
     params = {'query': query, 'format': js}
     headers = {"User-Agent": "mulder", "Accept": js}
-
 
     resp = requests.get(referer, params=params, headers=headers)
     if resp.status_code == HTTPStatus.OK:

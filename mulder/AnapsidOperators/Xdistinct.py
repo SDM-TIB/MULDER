@@ -8,6 +8,7 @@ The intermediate results are represented in a queue.
 '''
 from multiprocessing import Queue
 
+
 class Xdistinct(object):
     
     def __init__(self, vars):

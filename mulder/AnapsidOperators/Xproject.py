@@ -8,6 +8,7 @@ The intermediate results are represented in a queue.
 '''
 from multiprocessing import Queue
 
+
 class Xproject(object):
     
     def __init__(self, vars):
@@ -20,7 +21,7 @@ class Xproject(object):
         self.left = left
         self.qresults = out
         tuple = self.left.get(True)
-        while (not(tuple == "EOF")):
+        while not(tuple == "EOF"):
             res = {}
             if len(self.vars) == 0:
                 self.qresults.put(dict(tuple))

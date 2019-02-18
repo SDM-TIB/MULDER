@@ -492,15 +492,19 @@ class MediatorDecomposer(object):
         servs = []
         if intersects and len(intersects) > 0:
             [sourceindex[url].remove(e) for e in intersects for url in sourceindex]
-
+            ignore = []
             for url in sourceindex:
-                joins.append(JoinBlock([Service("<" + url + ">", list(intersects))]))
                 if len(sourceindex[url]) == len(triplepatterns):
                     servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
-
-            if len(servs) == len(sourceindex):
-                joins = servs
-                servs = []
+                    ignore.append(url)
+                else:
+                    joins.append(JoinBlock([Service("<" + url + ">", list(intersects))]))
+            for url in sourceindex:
+                if len(sourceindex[url]) > 0 and url not in ignore:
+                    servs.append(Service("<" + url + ">", list(set(sourceindex[url]))))
+            # if len(servs) == len(sourceindex):
+            #     joins = servs
+            #     servs = []
             # elif len(servs) == 1:
             #     joins = []
         else:
