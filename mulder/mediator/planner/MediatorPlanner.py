@@ -33,7 +33,7 @@ class MediatorPlanner(object):
         self.contact = contact
         self.endpType = endpointType
         self.config = config
-        self.buffersize = 168585
+        self.buffersize = 16384
         self.adaptive = True
 
     def createPlan(self):
@@ -632,18 +632,18 @@ class TreePlan(object):
 
             p1 = Process(target=self.left.execute, args=(qleft, processqueue, ))
             p1.start()
-            processqueue.put(p1.pid)
+            # processqueue.put(p1.pid)
             if "Nested" in self.operator.__class__.__name__:
                 p3 = Process(target=self.operator.execute, args=(qleft, self.right, outputqueue, processqueue, ))
                 p3.start()
-                processqueue.put(p3.pid)
+                # processqueue.put(p3.pid)
                 return
 
             # Check the right node to determine if evaluate it or not.
             if self.right and ((self.right.__class__.__name__ == "IndependentOperator") or (self.right.__class__.__name__ == "TreePlan")):
                 p2 = Process(target=self.right.execute, args=(qright, processqueue, ))
                 p2.start()
-                processqueue.put(p2.pid)
+                # processqueue.put(p2.pid)
             else:
                 qright = self.right #qright.put("EOF")
 
@@ -652,7 +652,7 @@ class TreePlan(object):
             #print "left and right "
             # Execute the plan
             p.start()
-            processqueue.put(p.pid)
+            # processqueue.put(p.pid)
 
 
 class IndependentOperator(object):
@@ -748,26 +748,26 @@ class IndependentOperator(object):
             self.tree.service.limit = 10000 #TODO: Fixed value, this can be learnt in the future
 
         # Evaluate the independent operator.
-        # self.q = None
-        # self.q = Queue()
 
-        p = Process(target=self.contact, args=(self.server, self.query_str, outputqueue, self.config, self.tree.service.limit,))
+        self.q = Queue()
+
+        p = Process(target=self.contact, args=(self.server, self.query_str, self.q, self.config, self.tree.service.limit,))
         p.start()
-        processqueue.put(p.pid)
+        # processqueue.put(p.pid)
 
-        # i = 0
-        # while True:
-        #     # Get the next item in queue.
-        #     res = self.q.get(True)
-        #     # Put the result into the output queue.
-        #     #print res
-        #     i += 1
-        #     outputqueue.put(res)
-        #     # Check if there's no more data.
-        #     if res == "EOF":
-        #         break
-        # #print self.tree.service.limit, i, "total - Independent operator done", self.query_str
-        # self.p.terminate()
+        i = 0
+        while True:
+            # Get the next item in queue.
+            res = self.q.get(True)
+            # Put the result into the output queue.
+            #print res
+            i += 1
+            outputqueue.put(res)
+            # Check if there's no more data.
+            if res == "EOF":
+                break
+
+        p.terminate()
 
 
 def contactSource(molecule, query, queue, config, limit=-1):
