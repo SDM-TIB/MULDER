@@ -25,10 +25,14 @@ metas = ['http://www.w3.org/ns/sparql-service-description',
          'http://bio2rdf.org/dataset_vocabulary:Endpoint',
          'http://www.w3.org/2002/07/owl#',
          "http://purl.org/goodrelations/",
-         'http://www.ontologydesignpatterns.org/ont/d0.owl#',
-         'http://www.wikidata.org/',
-         'http://dbpedia.org/ontology/Wikidata:',
-         'http://dbpedia.org/class/yago/',
+         # 'http://www.ontologydesignpatterns.org/ont/',
+         # 'http://www.wikidata.org',
+         # 'http://schema.org',
+         # 'http://xmlns.com/foaf/0.1',
+         # 'http://purl.org/',
+         'http://persistence.uni-leipzig.org',
+         # 'http://dbpedia.org/ontology/Wikidata:',
+         # 'http://dbpedia.org/class/yago/',
          "http://rdfs.org/ns/void#",
          'http://www.w3.org/ns/dcat',
          'http://www.w3.org/2001/vcard-rdf/',
@@ -153,7 +157,7 @@ def get_typed_concepts(endpoint, tq, limit=-1, types=[]):
                 if card < limit:
                     break
                 offset += limit
-                time.sleep(5)
+                # time.sleep(5)
         else:
             reslist, card = contactRDFSource(query, referer)
 
@@ -191,32 +195,33 @@ def get_typed_concepts(endpoint, tq, limit=-1, types=[]):
             predicates.append(pred)
 
             # Get range of this predicate from this RDF-MT t
-            ranges = get_rdfs_ranges(referer, pred)
-            if len(ranges) == 0:
-                rr = find_instance_range(referer, t, pred)
-                mtranges = list(set(ranges + rr))
-            else:
-                mtranges = ranges
-            ranges = []
+            if 'wikiPageWikiLink' not in pred:
+                ranges = get_rdfs_ranges(referer, pred)
+                if len(ranges) == 0:
+                    rr = find_instance_range(referer, t, pred)
+                    mtranges = list(set(ranges + rr))
+                else:
+                    mtranges = ranges
+                ranges = []
 
-            for mr in mtranges:
-                if '^^' in mr:
-                    continue
-                if xsd not in mr:
-                    ranges.append(mr)
+                for mr in mtranges:
+                    if '^^' in mr:
+                        continue
+                    if xsd not in mr:
+                        ranges.append(mr)
 
-            if len(ranges) > 0:
-                linkedto.extend(ranges)
-            rdfpropteries.append({
-                "predicate": pred,
-                "range": ranges,
-                "policies": [
-                    {
-                        "dataset": endpoint,
-                        "operator": "PR"
-                    }
-                ]
-            })
+                if len(ranges) > 0:
+                    linkedto.extend(ranges)
+                rdfpropteries.append({
+                    "predicate": pred,
+                    "range": ranges,
+                    "policies": [
+                        {
+                            "dataset": endpoint,
+                            "operator": "PR"
+                        }
+                    ]
+                })
 
         rdfmt = {
             "rootType": t,
@@ -249,7 +254,7 @@ def get_rdfs_ranges(referer, p, limit=-1):
 
     reslist = []
     if limit == -1:
-        limit = 100
+        limit = 1000
         offset = 0
         numrequ = 0
         while True:
@@ -268,7 +273,9 @@ def get_rdfs_ranges(referer, p, limit=-1):
             if card < limit:
                 break
             offset += limit
-            time.sleep(2)
+            if offset > 1000:
+                break
+            # time.sleep(2)
     else:
         reslist, card = contactRDFSource(RDFS_RANGES, referer)
 
@@ -295,7 +302,7 @@ def find_instance_range(referer, t, p, limit=-1):
     #
     reslist = []
     if limit == -1:
-        limit = 50
+        limit = 200
         offset = 0
         numrequ = 0
         while True:
@@ -314,7 +321,9 @@ def find_instance_range(referer, t, p, limit=-1):
             if card < limit:
                 break
             offset += limit
-            time.sleep(2)
+            if offset > 10000:
+                break
+            # time.sleep(2)
     else:
         reslist, card = contactRDFSource(INSTANCE_RANGES, referer)
 
@@ -374,7 +383,7 @@ def get_predicates(referer, t, limit=-1):
             if card < limit:
                 break
             offset += limit
-            time.sleep(2)
+            # time.sleep(2)
     else:
         reslist, card = contactRDFSource(query, referer)
 
@@ -424,7 +433,7 @@ def get_preds_of_random_instances(referer, t, limit=-1):
             if card < limit:
                 break
             offset += limit
-            time.sleep(5)
+            # time.sleep(5)
     else:
         reslist, card = contactRDFSource(query, referer)
 
@@ -455,7 +464,7 @@ def get_preds_of_instance(referer, inst, limit=-1):
             if card < limit:
                 break
             offset += limit
-            time.sleep(2)
+            # time.sleep(2)
     else:
         reslist, card = contactRDFSource(query, referer)
 
