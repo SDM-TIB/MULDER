@@ -8,11 +8,12 @@ USER root
 RUN apt-get update && \
     apt-get install -y --no-install-recommends  nano wget git curl less psmisc && \
     apt-get install -y --no-install-recommends python3.5 python3-pip python3-setuptools && \
-    pip3 install --upgrade pip
+    pip3 install --no-cache-dir --upgrade pip==20.3.4 && \
+    apt-get clean
 
 ADD . /MULDER
 
-RUN cd /MULDER && pip3 install -r requirements.txt && \
+RUN cd /MULDER && pip3 install --no-cache-dir -r requirements.txt && \
     python3.5 setup.py install
 
 
